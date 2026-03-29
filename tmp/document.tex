@@ -1,0 +1,329 @@
+\documentclass[25pt, a0paper, portrait]{tikzposter}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{helvet}
+\usepackage{enumitem}
+\usepackage[most]{tcolorbox}
+
+\makeatletter
+\setlength{\TP@blockverticalspace}{18mm}
+\setlength{\TP@colspace}{18mm}
+\makeatother
+
+\renewcommand{\familydefault}{\sfdefault}
+
+% --- 主题与颜色设置 ---
+\usetheme{Simple}
+\usecolorstyle{Default}
+
+\definetitlestyle{NoFrame}{
+    width=\textwidth, linewidth=0pt, innersep=15mm,
+    titletotopverticalspace=15mm, titletoblockverticalspace=15mm,
+    titlegraphictotitledistance=10mm, titletextscale=1
+}{
+    \fill[color=titlebgcolor] (\titleposleft,\titleposbottom) rectangle (\titleposright,\titlepostop);
+}
+\usetitlestyle{NoFrame}
+
+% --- Apple-like 配色 ---
+\definecolor{TechNavy}{HTML}{1D1D1F}
+\definecolor{TechBlue}{HTML}{EAF3FF}
+\definecolor{TechCyan}{HTML}{0071E3}
+\definecolor{TechMint}{HTML}{E9F7EF}
+\definecolor{TechText}{HTML}{1D1D1F}
+\definecolor{TechPurple}{HTML}{0071E3}
+\definecolor{TechRose}{HTML}{FF375F}
+\definecolor{TechBg}{HTML}{F5F5F7}
+\definecolor{TechCard}{HTML}{FFFFFF}
+\definecolor{CaseDialogue}{HTML}{F2F4F7}
+\definecolor{CaseJudgement}{HTML}{FBFBFD}
+\definecolor{CaseGreen}{HTML}{3A3A3C}
+\definecolor{CaseBlue}{HTML}{0071E3}
+\definecolor{CaseBorder}{HTML}{D2D2D7}
+\definecolor{AppleMuted}{HTML}{6E6E73}
+
+\newcommand{\placeholdergraphic}[3]{%
+    {\setlength{\fboxsep}{0pt}%
+        \fcolorbox{TechCyan}{white}{%
+            \parbox[c][#2][c]{#1}{\centering\textcolor{TechPurple}{\textbf{#3}}}%
+        }%
+    }%
+}
+
+\newcommand{\safeimageheight}[3]{%
+    \IfFileExists{#2}{\includegraphics[height=#1]{#2}}{\placeholdergraphic{#1}{#1}{#3}}%
+}
+
+\newcommand{\safeimagewidth}[3]{%
+    \IfFileExists{#2}{\includegraphics[width=#1]{#2}}{\placeholdergraphic{#1}{\dimexpr #1 * 9 / 16\relax}{#3}}%
+}
+
+\newtcolorbox{caseouterbox}{
+    enhanced,
+    breakable,
+    colback=white,
+    boxrule=0pt,
+    left=4mm,
+    right=4mm,
+    top=3mm,
+    bottom=3mm,
+    arc=8mm,
+    borderline={0.9pt}{0pt}{CaseBorder,dash pattern=on 7pt off 3pt on 1.2pt off 3pt}
+}
+
+\newtcolorbox{casedialogbox}{
+    enhanced,
+    breakable,
+    colback=CaseDialogue,
+    colframe=CaseBorder,
+    boxrule=0.7pt,
+    left=4mm,
+    right=4mm,
+    top=3mm,
+    bottom=3mm,
+    arc=6mm,
+    fontupper=\scriptsize,
+    before upper={\setlength{\parindent}{0pt}}
+}
+
+\newtcolorbox{casejudgebox}{
+    enhanced,
+    breakable,
+    colback=CaseJudgement,
+    colframe=CaseBorder,
+    boxrule=0.7pt,
+    left=4mm,
+    right=4mm,
+    top=3mm,
+    bottom=3mm,
+    arc=6mm,
+    fontupper=\scriptsize,
+    before upper={\setlength{\parindent}{0pt}}
+}
+
+\colorlet{backgroundcolor}{TechBg}
+\colorlet{framecolor}{CaseBorder}
+\colorlet{titlebgcolor}{TechCard}
+\colorlet{titlefgcolor}{TechNavy}
+\colorlet{blocktitlebgcolor}{TechBlue!55!white}
+\colorlet{blocktitlefgcolor}{TechNavy}
+\colorlet{blockbodybgcolor}{TechCard}
+\colorlet{blockbodyfgcolor}{TechText}
+\colorlet{innerblocktitlebgcolor}{TechBlue!38!white}
+\colorlet{innerblocktitlefgcolor}{TechNavy}
+\colorlet{innerblockbodybgcolor}{TechBg!55!white}
+\colorlet{innerblockbodyfgcolor}{TechText}
+
+% --- macOS 窗口风格块 ---
+\defineblockstyle{MacWindow}{
+titlewidthscale=1, bodywidthscale=1, titleleft,
+titleoffsetx=0pt, titleoffsety=0pt, bodyoffsetx=0pt, bodyoffsety=10mm,
+bodyverticalshift=10mm, roundedcorners=20, linewidth=0.9pt,
+titleinnersep=9mm, bodyinnersep=10mm
+}{
+\ifBlockHasTitle
+\draw[rounded corners=\blockroundedcorners, line width=\blocklinewidth,
+color=framecolor, fill=blockbodybgcolor]
+(blockbody.south west) rectangle (blockbody.north east);
+\draw[rounded corners=\blockroundedcorners, line width=\blocklinewidth,
+color=framecolor, fill=blocktitlebgcolor]
+(blocktitle.south west) rectangle (blocktitle.north east);
+\fi
+}
+\useblockstyle{MacWindow}
+
+\renewcommand{\labelitemi}{\textcolor{TechCyan}{\scriptsize$\bullet$}}
+\setlist[itemize]{leftmargin=1.2em, itemsep=0.35em, topsep=0.35em}
+\setlist[enumerate]{leftmargin=1.2em, itemsep=0.35em, topsep=0.35em}
+
+\newcommand{\techbadge}[1]{%
+\fcolorbox{CaseBorder}{TechCard}{\textcolor{TechCyan}{\footnotesize\textbf{\hspace{0.35cm}#1\hspace{0.35cm}}}}%
+}
+
+\newcommand{\techicon}{%
+\raisebox{-0.1em}{\shortstack[c]{%
+\textcolor{red!75!black}{\normalsize$\bullet$}\\[-0.1ex]
+\textcolor{orange!80!black}{\normalsize$\bullet$}\\[-0.1ex]
+\textcolor{green!60!black}{\normalsize$\bullet$}}}%
+\hspace{0.28em}%
+}
+
+\newcommand{\techpanel}[1]{%
+{\setlength{\fboxsep}{2pt}\fcolorbox{CaseBorder}{TechCard}{\parbox{0.9\linewidth}{\centering \vspace{1cm} \textcolor{TechCyan}{\textit{#1}} \vspace{1cm}}}}%
+}
+
+\newcommand{\techpanelsmall}[1]{%
+{\setlength{\fboxsep}{1pt}\fcolorbox{CaseBorder}{TechCard}{\parbox{0.6\linewidth}{\centering \vspace{1.3cm} \textcolor{TechCyan}{\textit{#1}} \vspace{1.3cm}}}}%
+}
+
+% --- 标题信息 ---
+\title{%
+    \parbox[l]{0.15\linewidth}{\centering\raisebox{-0.5\height}{\safeimageheight{6cm}{logo.png}{Soochow Univ}}}%
+    \parbox[l]{0.70\linewidth}{\centering \textbf{\huge RELATIVE TIME INTERVALS REPRESENTATION \\ FOR WORD-LEVEL TIMESTAMPING \\ WITH MASKED TRAINING}}%
+    \parbox[l]{0.15\linewidth}{\centering\raisebox{-0.5\height}{\safeimageheight{6cm}{suda.png}{AISpeech}}}%
+    }
+\author{\Large Quanwei Tang$^{1}$, Zhiyu Tang$^{2}$, Xu Li$^{3}$, Dong Zhang$^{1,\dagger}$, Shoushan Li$^{1}$, Guodong Zhou$^{1}$}
+\institute{$^{1}$Soochow University \quad $^{2}$University of Queensland \quad $^{3}$AISpeech Ltd, Suzhou, China}
+
+\begin{document}
+    
+    \maketitle
+	\block{\techicon 1. Motivation \& Limitations}{
+		\begin{center}
+		\begin{minipage}[c]{0.485\linewidth}
+			\begin{itemize}
+				\item \textbf{The Problem:} Speech LLMs excel at content understanding but struggle with fine-grained, word-level temporal alignment.
+				\item \textbf{Absolute Timestamp Pitfalls:} Existing methods (e.g., Qwen2-Audio) use formats like $<|0.45|>\text{Okay}<|1.10|>\text{let's}$, leading to:
+				\begin{itemize}
+					\item \textit{Cumulative Error:} Monotonically increasing values cause error propagation.
+					\item \textit{Poor Generalization:} Fails on audio longer than training duration (e.g., predicts $>30$s if only trained on $30$s clips).
+					\item \textit{Vocabulary Explosion:} $0.01$s precision over $300$s audio requires $\sim$30,000 distinct timestamp tokens.
+				\end{itemize}
+				\item \textbf{Our Solution:} \textbf{Relative Time Intervals} \& \textbf{Masked Training}, transforming LLMs into ``temporal-aware content understanding machines''.
+				Instead of absolute positions, we model the \textbf{time interval} between consecutive words (e.g., $<|0.65|>$ for words at $0.45$s and $1.10$s).
+				\begin{itemize}
+					\item \textbf{Compact Vocabulary:} Only a limited range (e.g., $0.00$s to $5.00$s) is needed. Any length of audio can be represented cumulatively.
+					\item \textbf{Natural Paradigm:} Aligns perfectly with the autoregressive generation of LLMs. Avoids learning unrelated absolute values.
+				\end{itemize}
+			\end{itemize}
+		\end{minipage}\hfill
+		\begin{minipage}[c]{0.485\linewidth}
+			\begin{center}
+				% 替换为论文 Fig 1 (Absolute vs Relative 可视化对比图)
+				\safeimagewidth{0.95\linewidth}{intro.png}{Fig 1: Absolute vs. Relative Timestamps}
+			\end{center}
+		\end{minipage}
+		\end{center}
+	}
+
+    \block{\techicon 2. Method Overview}{
+        \begin{center}
+            \includegraphics[width=0.95\linewidth]{method.pdf}
+        \end{center}
+    }
+    
+    \begin{columns}
+        
+        % ==================== 左栏：痛点与方法 ====================
+        \column{0.5}
+        
+        \block{\techicon 3. Training Strategies \& Fine-Tuning}{
+            
+            \textbf{1. Hybrid Parameter-Efficient Fine-Tuning:}
+            \begin{itemize}
+                \item \textbf{Full-param:} Timestamp embedding layer \& LM Head (learn new temporal vocabulary from scratch).
+                \item \textbf{LoRA:} Decoder layers (preserve pre-trained linguistic knowledge, save compute).
+            \end{itemize}
+            
+            \vspace{0.5cm}
+            \textbf{2. Joint Temporal Alignment Loss:}
+            \begin{equation}
+                L_{total} = L_{text} + \lambda L_{timestamp}
+            \end{equation}
+            Dynamic weighting: $\lambda$ starts at $1$ (focus on text) and increments by $1$ per epoch (shift focus to timestamps).
+            
+            \vspace{0.5cm}
+            \textbf{3. Timestamp Masking (Regularization):}
+            \begin{itemize}
+                \item Randomly replaces previous timestamps with a $<$mask$>$ token (10\% probability from epoch 2).
+                \item Prevents over-relying on ground-truth history. Forces the model to \textit{listen to the actual audio pause} to infer time, enhancing robustness against noisy annotations.
+            \end{itemize}
+        }
+        
+        % ==================== 右栏：实验与结论 ====================
+        \column{0.5}
+        
+
+        \block{\techicon 4. Main Results}{
+            
+            \textbf{Our method sets a new SOTA for timestamp prediction while significantly improving ASR (WER).}
+            
+                \textcolor{TechPurple}{\textbf{Timestamp prediction (Wenet-Meeting) \& ASR performance comparison.}}
+                \vspace{0.35cm}
+                \centering
+                {\scriptsize
+                \setlength{\tabcolsep}{4pt}
+                \renewcommand{\arraystretch}{1.15}
+                \resizebox{0.95\linewidth}{!}{%
+                \begin{tabular}{l c c c c c}
+                    \toprule
+                    \textbf{Model} & \textbf{Tolerance} & \textbf{Precision} & \textbf{Recall} & \textbf{Avg. Diff} & \textbf{WER (\%)} \\
+                    & (ms) & (\%) & (\%) & (ms) & \textit{(Wenet)} \\
+                    \midrule
+                    Qwen2-Audio & 240 & 82.30 & 75.87 & 43.07 & 21.99 \\
+                    WhisperTS & 240 & 43.97 & 18.79 & 102.48 & 56.66 \\
+                    SenseVoice & 240 & 82.82 & 81.19 & 32.47 & 7.54 \\
+                    \midrule
+                    Abs. TS (Baseline) & 240 & 72.41 & 68.22 & 152.17 & 11.30 \\
+                    \textbf{Relative TS (Ours)} & \textbf{240} & \textbf{91.13} & \textbf{86.88} & \textbf{30.34} & \textbf{5.56} \\
+                    \bottomrule
+                \end{tabular}%
+                }
+                }
+            
+            \vspace{0.5cm}
+            \begin{itemize}
+                \item Achieves \textbf{30.34 ms} average difference, the closest to ground truth.
+                \item Surprisingly, adding the timestamp task \textbf{decreases WER} from $11.30\%$ to $5.56\%$, proving temporal modeling forces better acoustic feature extraction.
+            \end{itemize}
+        }
+        
+        % \block{\techicon 5. Ablation Study}{
+            
+        %     \textbf{Dissecting the core contributions on AISHELL-2 \& Common Voice (240ms tolerance).}
+            
+        %     \vspace{0.5cm}
+        %     \begin{center}
+        %         \begin{minipage}[t]{0.485\linewidth}
+        %             \begin{caseouterbox}
+        %                 \begin{center}
+        %                     \textbf{\Large Impact of Relative TS}
+        %                 \end{center}
+        %                 \begin{casedialogbox}
+        %                     \begin{center}
+        %                         \textcolor{CaseGreen}{\textbf{Absolute vs. Relative}}
+        %                     \end{center}
+        %                     \textbf{AISHELL-2 WER:} 2.87\% $\rightarrow$ \textbf{2.15\%} \\
+        %                     \textbf{AISHELL-2 Precision:} 95.44\% $\rightarrow$ \textbf{97.63\%} \\
+        %                     \textbf{CV Precision:} 78.61\% $\rightarrow$ \textbf{87.70\%} \\
+        %                     Relative intervals naturally resolve error accumulation and vocabulary explosion.
+        %                 \end{casedialogbox}
+        %             \end{caseouterbox}
+        %         \end{minipage}\hfill
+        %         \begin{minipage}[t]{0.485\linewidth}
+        %             \begin{caseouterbox}
+        %                 \begin{center}
+        %                     \textbf{\Large Impact of TS Masking}
+        %                 \end{center}
+        %                 \begin{casedialogbox}
+        %                     \begin{center}
+        %                         \textcolor{CaseGreen}{\textbf{w/ Mask vs. w/o Mask}}
+        %                     \end{center}
+        %                     \textbf{AISHELL-2 WER:} 2.56\% $\rightarrow$ \textbf{2.15\%} \\
+        %                     \textbf{CV WER:} 14.47\% $\rightarrow$ \textbf{11.63\%} \\
+        %                     \textbf{CV Precision:} 80.67\% $\rightarrow$ \textbf{87.70\%} \\
+        %                     Masking prevents ``lazy'' cumulative addition and forces reliance on acoustic pauses.
+        %                 \end{casedialogbox}
+        %             \end{caseouterbox}
+        %         \end{minipage}
+        %     \end{center}
+        % }
+    \end{columns}
+
+	\block{\techicon 6. Conclusion}{
+		\begin{minipage}[l]{0.9\linewidth}
+			We propose a novel framework addressing core challenges in precise temporal sequence understanding for Speech LLMs.
+			\begin{itemize}
+				\item \textbf{Beyond simple tagging:} Endows LLMs with fine-grained, aligned multi-modal spatiotemporal understanding capabilities.
+				\item \textbf{Highly Scalable:} Compact vocabulary enables robust timestamping for \textit{arbitrarily long audio} without degradation.
+				\item \textbf{Mutual Enhancement:} Temporal alignment regularization actively improves standard ASR performance.
+			\end{itemize}
+			\end{minipage}\hfill
+		\begin{minipage}[c]{0.1\linewidth}
+				\includegraphics[width=6cm]{qr.png}
+		\end{minipage}
+	}
+\end{document}

@@ -1,0 +1,29 @@
+# LaTeX build outputs
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.vrb
+
+# Backup files
+*.bak
+*.swp
+*~
+.*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.synctex(busy)
+*.synctex.gz(busy)
+\#*#
+.*.bak

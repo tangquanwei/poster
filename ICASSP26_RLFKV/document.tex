@@ -1,0 +1,252 @@
+\documentclass[25pt, a0paper, portrait]{tikzposter}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{helvet}
+\usepackage{enumitem}
+
+\makeatletter
+\setlength{\TP@blockverticalspace}{18mm}
+\setlength{\TP@colspace}{18mm}
+\makeatother
+
+\renewcommand{\familydefault}{\sfdefault}
+
+% --- 主题与颜色设置 ---
+\usetheme{Simple}
+\usecolorstyle{Default}
+
+% 去除标题边框的自定义样式
+\definetitlestyle{NoFrame}{
+	width=\textwidth, linewidth=0pt, innersep=15mm,
+	titletotopverticalspace=15mm, titletoblockverticalspace=15mm,
+	titlegraphictotitledistance=10mm, titletextscale=1
+}{
+	\fill[color=titlebgcolor] (\titleposleft,\titleposbottom) rectangle (\titleposright,\titlepostop);
+}
+\usetitlestyle{NoFrame}
+
+% --- 科技感配色 ---
+\definecolor{TechNavy}{HTML}{0A1633}
+\definecolor{TechBlue}{HTML}{DCE9FF}
+\definecolor{TechCyan}{HTML}{00D1FF}
+\definecolor{TechMint}{HTML}{00E6C3}
+\definecolor{TechText}{HTML}{182849}
+\definecolor{TechPurple}{HTML}{7B61FF}
+\definecolor{TechRose}{HTML}{FF4FB3}
+\definecolor{TechBg}{HTML}{F2F7FF}
+\definecolor{TechCard}{HTML}{EAF1FF}
+
+\colorlet{backgroundcolor}{TechBg}
+\colorlet{framecolor}{TechCyan!68!TechPurple}
+\colorlet{titlebgcolor}{TechCard!92!white}
+\colorlet{titlefgcolor}{TechNavy}
+\colorlet{blocktitlebgcolor}{TechCyan!20!TechPurple!8!white}
+\colorlet{blocktitlefgcolor}{TechNavy}
+\colorlet{blockbodybgcolor}{white}
+\colorlet{blockbodyfgcolor}{TechText}
+\colorlet{innerblocktitlebgcolor}{TechPurple!18!TechCyan!8!white}
+\colorlet{innerblocktitlefgcolor}{TechNavy}
+\colorlet{innerblockbodybgcolor}{TechCard!95!white}
+\colorlet{innerblockbodyfgcolor}{TechText}
+
+% --- macOS 窗口风格块 ---
+\defineblockstyle{MacWindow}{
+titlewidthscale=1, bodywidthscale=1, titleleft,
+titleoffsetx=0pt, titleoffsety=0pt, bodyoffsetx=0pt, bodyoffsety=10mm,
+bodyverticalshift=10mm, roundedcorners=18, linewidth=1.2pt,
+titleinnersep=9mm, bodyinnersep=10mm
+}{
+\ifBlockHasTitle
+\draw[rounded corners=\blockroundedcorners, line width=\blocklinewidth,
+color=framecolor, fill=blockbodybgcolor]
+(blockbody.south west) rectangle (blockbody.north east);
+\draw[rounded corners=\blockroundedcorners, line width=\blocklinewidth,
+color=framecolor, fill=blocktitlebgcolor]
+(blocktitle.south west) rectangle (blocktitle.north east);
+\fi
+}
+\useblockstyle{MacWindow}
+
+% --- 装饰元素（稳定版）---
+\renewcommand{\labelitemi}{\textcolor{TechCyan}{\scriptsize$\bullet$}}
+\setlist[itemize]{leftmargin=1.2em, itemsep=0.35em, topsep=0.35em}
+\setlist[enumerate]{leftmargin=1.2em, itemsep=0.35em, topsep=0.35em}
+
+\newcommand{\techbadge}[1]{%
+\fcolorbox{TechCyan}{TechCard}{\textcolor{TechPurple}{\footnotesize\textbf{\hspace{0.35cm}#1\hspace{0.35cm}}}}%
+}
+
+\newcommand{\techicon}{%
+\raisebox{-0.1em}{\shortstack[c]{%
+\textcolor{red!75!black}{\normalsize$\bullet$}\\[-0.1ex]
+\textcolor{orange!80!black}{\normalsize$\bullet$}\\[-0.1ex]
+\textcolor{green!60!black}{\normalsize$\bullet$}}}%
+\hspace{0.28em}%
+}
+
+\newcommand{\techpanel}[1]{%
+{\setlength{\fboxsep}{2pt}\fcolorbox{TechCyan}{TechCard}{\parbox{0.9\linewidth}{\centering \vspace{1cm} \textcolor{TechPurple}{\textit{#1}} \vspace{1cm}}}}%
+}
+
+\newcommand{\techpanelsmall}[1]{%
+{\setlength{\fboxsep}{1pt}\fcolorbox{TechCyan}{TechCard}{\parbox{0.6\linewidth}{\centering \vspace{1.3cm} \textcolor{TechPurple}{\textit{#1}} \vspace{1.3cm}}}}%
+}
+
+% --- 标题信息 ---
+\title{%
+	\parbox[l]{0.1\linewidth}{\raisebox{-0.5\height}{\includegraphics[height=6cm]{logo.png}}}%
+	\parbox[l]{0.67\linewidth}{\centering \textbf{\huge MITIGATING HALLUCINATION IN FINANCIAL \\ RETRIEVAL-AUGMENTED GENERATION \\ VIA FINE-GRAINED KNOWLEDGE VERIFICATION}}%
+	\parbox[l]{0.2\linewidth}{\raisebox{-0.5\height}{\includegraphics[height=6cm]{ant.png}}}%
+	}
+\author{\Large Taoye Yin$^{*}$, Haoyuan Hu$^{*}$, Yaxin Fan, Xinhao Chen, Xinya Wu, Kai Deng, Kezun Zhang,  Feng Wang}
+\institute{Ant Group, Hangzhou, China}
+
+\begin{document}
+	
+	\maketitle
+	
+	\begin{columns}
+		
+		% ==================== 左栏：痛点与方法 ====================
+		\column{0.5}
+		
+		\block{\techicon 1. Motivation}{
+			\begin{itemize}
+				\item \textbf{The Problem:} Financial RAG systems rely heavily on retrieved documents, but LLMs still generate hallucinations that contradict the retrieved facts (e.g., temporal or numerical inconsistencies).
+				\item \textbf{Existing Solutions:} RL methods typically use coarse binary rewards based on human annotations. This incurs high costs and provides unstable optimization signals.
+				\item \textbf{Our Solution:} A Reinforcement Learning framework with \textbf{Fine-grained Knowledge Verification (RLFKV)}.
+			\end{itemize}
+
+			\vspace{0.5cm}
+			\begin{center}
+				\includegraphics[width=0.7\linewidth]{figure1.png}
+			\end{center}
+		}
+		
+		\block{\techicon 2. RLFKV Framework}{
+			
+			% 建议在这里放置原论文的 Fig. 2 (The framework of RLFKV)
+			\begin{center}
+				\includegraphics[width=1\linewidth]{image.png}
+			\end{center}
+			
+			\vspace{1cm}
+			Our framework optimizes the policy model without manual reference answers through two main steps:
+			\begin{enumerate}
+				\item \textbf{Decomposition \& Verification:} Decomposes the response into atomic knowledge units (Entity, Metric, Value, Timestamp) and verifies each against retrieved docs.
+				\item \textbf{Optimization (GRPO):} Uses verification results to compute fine-grained rewards.
+			\end{enumerate}
+		}
+		
+		\block{\techicon 3. Fine-Grained Rewards Formulation}{
+			
+			We jointly maximize two reward signals to balance faithfulness and prevent reward hacking (overly concise replies).
+			
+			\vspace{0.5cm}
+			\textbf{1. Faithful Reward ($r_f$):} Penalizes factual inconsistencies smoothly.
+			\begin{equation}
+				r_f = \frac{1}{e^{\eta \cdot \min(\sum_{i=1}^{k} \mathbb{I}(s_i = 0), \gamma)}}
+			\end{equation}
+			where $s_i \in \{0,1\}$ is the verification score of unit $i$, and $\gamma$ caps the penalty.
+			
+			\vspace{0.5cm}
+			\textbf{2. Informative Reward ($r_i$):} Ensures informational depth matches the base model.
+			\begin{equation}
+				r_{i}=\begin{cases}1 & \text{if } k \ge k_{0}\\ 0 & \text{otherwise}\end{cases}
+			\end{equation}
+			where $k_0$ is the number of atomic units generated by the base model $\pi_0$.
+		}
+		
+		% ==================== 右栏：实验与结论 ====================
+		\column{0.5}
+		
+
+		\block{\techicon 4. Main Results}{
+			
+			\textbf{RLFKV effectively reduces hallucination while maintaining informativeness.}
+			
+			\vspace{1cm}
+			\begin{minipage}[c]{0.55\linewidth}
+				\textcolor{TechPurple}{\textbf{Table 1: Main Results}}
+				\vspace{0.5cm}
+
+				\begin{tabular}{l cc cc}
+					\toprule
+					\multirow{2}{*}{\textbf{Model}} & \multicolumn{2}{c}{\textbf{FDD}} & \multicolumn{2}{c}{\textbf{FDD-ANT}} \\
+					\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+					& faith & info & faith & info \\
+					\midrule
+					\multicolumn{5}{l}{\textit{open-source model}} \\
+					DeepSeek V2 Lite & 69.1 & 8.8 & 76.1 & 5.4 \\
+					LlaMA3 & 80.0 & 11.4 & 80.5 & 6.5 \\
+					Qwen3 & 86.5 & 13.4 & 90.2 & 10.8 \\
+					\midrule
+					\multicolumn{5}{l}{\textit{finance model}} \\
+					Xuanyuan3 & 57.8 & 7.9 & 64.6 & 5.8 \\
+					Dianjin-R1 & 78.3 & 10.8 & 84.7 & 6.8 \\
+					\midrule
+					\multicolumn{5}{l}{\textit{ours}} \\
+					RLFKV\textsubscript{\textit{LlaMA3}} & 83.6 & 11.7 & 82.1 & 8.1 \\
+					\quad w/o info reward & 83.2 & 10.3 & 81.4 & 7.0 \\
+					RLFKV\textsubscript{\textit{Qwen3}} & \textbf{89.5} & \textbf{13.5} & \textbf{93.3} & \textbf{12.3} \\
+					\quad w/o info reward & 89.0 & 12.0 & 91.9 & 11.2 \\
+					\bottomrule
+				\end{tabular}
+			\end{minipage}\hfill
+			\begin{minipage}[c]{0.4\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{fa.png}\\[0.2cm]
+				{\small (a) Performance on FDD-ANT.}\\[0.8cm]
+				\includegraphics[width=\linewidth]{fb.png}\\[0.2cm]
+				{\small (b) Reward during training.}
+			\end{minipage}
+			
+			\vspace{0.5cm}
+			\begin{itemize}
+				\item On FDD-ANT, $RLFKV_{Qwen3}$ improves faithfulness by \textbf{3.1 points} over the Qwen3 base model.
+				\item Ablation studies show that removing the informative reward drops the informativeness metric significantly, validating its necessity.
+			\end{itemize}
+		}
+		
+		\block{\techicon 5. Reward Analysis \& Error Types}{
+			
+			\textbf{Stability:} Fine-grained rewards demonstrate more stable optimization and converge more rapidly (within 2k steps) compared to coarse-grained binary rewards.
+			
+			\vspace{0.5cm}
+			\textbf{Remaining Challenges:} Error analysis on FDD-ANT reveals three persistent error types:
+			\begin{itemize}
+				\item \textbf{Time Omission (55\%):} Critical temporal references are absent.
+				\item \textbf{Time Error (28\%):} Relative time expressions / calendar year conversions.
+				\item \textbf{Numerical Error (17\%):} Imprecise rounding.
+			\end{itemize}
+			
+			% Fig. 4 饼图
+			\begin{center}
+				\textcolor{TechPurple}{\textbf{Figure: Error analysis on FDD-ANT dataset.}}
+				\includegraphics[width=0.5\linewidth]{fc.png}
+			\end{center}
+		}
+		
+		\block{\techicon 6. Conclusion}{
+			
+			\begin{itemize}
+				\item Proposed RLFKV, decomposing responses into verifiable atomic knowledge units.
+				\item Achieved consistent improvements in financial RAG factual accuracy without costly human annotations.
+				\item Released \textbf{FDD-ANT} dataset to advance real-world financial evaluation.
+			\end{itemize}
+			
+			\vspace{1cm}
+			\begin{minipage}{0.5\linewidth}
+				\textbf{Scan for Code \& Dataset:} \\
+				\textcolor{TechMint}{github.com/antgroup/ANT-Fin-RAG}
+			\end{minipage}
+			\begin{minipage}{0.25\linewidth}
+				% 二维码占位
+				\includegraphics[width=5.5cm]{qr.png}
+			\end{minipage}
+		}
+	\end{columns}
+\end{document}
