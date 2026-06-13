@@ -1,4 +1,4 @@
-\documentclass[25pt, a0paper, portrait]{tikzposter}
+\documentclass[25pt, a0paper, landscape]{tikzposter}
 \usepackage{amsmath, amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -9,8 +9,10 @@
 \usepackage[most]{tcolorbox}
 
 \makeatletter
-\setlength{\TP@blockverticalspace}{18mm}
-\setlength{\TP@colspace}{18mm}
+\setlength{\TP@visibletextwidth}{\dimexpr\textwidth-2\TP@innermargin\relax}
+\setlength{\TP@visibletextheight}{\dimexpr\textheight-2\TP@innermargin\relax}
+\setlength{\TP@blockverticalspace}{12mm}
+\setlength{\TP@colspace}{14mm}
 \makeatother
 
 \renewcommand{\familydefault}{\sfdefault}
@@ -67,8 +69,8 @@
 	breakable,
 	colback=white,
 	boxrule=0pt,
-	left=4mm,
-	right=4mm,
+	left=3mm,
+	right=3mm,
 	top=3mm,
 	bottom=3mm,
 	arc=8mm,
@@ -163,9 +165,9 @@ color=framecolor, fill=blocktitlebgcolor]
 
 % --- 标题信息 ---
 \title{%
-	\parbox[l]{0.2\linewidth}{\raisebox{-0.5\height}{\safeimageheight{6cm}{logo.png}{Logo}}}%
-	\parbox[l]{0.65\linewidth}{\centering \textbf{\huge INTERMITTENT SEMI-WORKING MASK: \\ A NEW MASKING PARADIGM FOR LLMs}}%
-	\parbox[l]{0.2\linewidth}{\hspace*{-5.5cm}\raisebox{-0.5\height}{\safeimageheight{6cm}{ant.png}{Ant}}}%
+	\parbox[c]{0.18\linewidth}{\raisebox{-0.5\height}{\safeimageheight{6cm}{logo.png}{Logo}}}%
+	\parbox[c]{0.64\linewidth}{\centering \textbf{\huge INTERMITTENT SEMI-WORKING MASK: \\ A NEW MASKING PARADIGM FOR LLMs}}%
+	\parbox[c]{0.18\linewidth}{\raggedleft\raisebox{-0.5\height}{\safeimageheight{6cm}{ant.png}{Ant}}}%
 	}
 \author{\Large HaoYuan Hu$^{1,2,*}$, Mingcong Lu$^{2,*}$, Di Luo$^{2,*}$, XinYa Wu$^{2}$, Jiangcai Zhu$^{2}$, Taoye Yin$^{2}$, Zheng Li$^{2}$, \\ Hao Wang$^{2}$, Shusheng Zhang$^{2}$, KeZun Zhang$^{2}$, KaiLai Shao$^{2}$, Chao Chen$^{2}$, Feng Wang$^{2,\dagger}$}
 \institute{$^{1}$Zhejiang University \quad $^{2}$Ant Group}
@@ -176,8 +178,8 @@ color=framecolor, fill=blocktitlebgcolor]
 	
 	\begin{columns}
 		
-		% ==================== 左栏：痛点与方法 ====================
-		\column{0.5}
+		% ==================== 第 1 栏：1-2 ====================
+		\column{0.333}
 		
 		\block{\techicon 1. Motivation}{
 			\begin{itemize}
@@ -197,7 +199,7 @@ color=framecolor, fill=blocktitlebgcolor]
 			
 			% 建议替换为原论文的 Fig. 1c 或 Mask Matrix 可视化
 			\begin{center}
-				\includegraphics[width=0.7\linewidth]{image copy.png}
+				\includegraphics[width=0.9\linewidth]{image copy.png}
 			\end{center}
 			
 			\vspace{1cm}
@@ -208,6 +210,9 @@ color=framecolor, fill=blocktitlebgcolor]
 				\item \textbf{Future Blocks:} Completely masked out to ensure causality.
 			\end{itemize}
 		}
+
+		% ==================== 第 2 栏：3-4 ====================
+		\column{0.334}
 
 		\block{\techicon 3. Mathematical Formulation}{
 			
@@ -234,11 +239,6 @@ color=framecolor, fill=blocktitlebgcolor]
 				\item \textbf{Zero Overhead:} Architecture-agnostic, parameter-free, drop-in compatible with causal LLMs.
 			\end{itemize}
 		}
-		
-		% ==================== 右栏：实验与结论 ====================
-		\column{0.5}
-		
-
 		\block{\techicon 4. Main Results}{
 			
 			\textbf{ISM consistently improves multi-turn dialogue and mathematical reasoning.}
@@ -249,7 +249,7 @@ color=framecolor, fill=blocktitlebgcolor]
 				{\scriptsize
 				\setlength{\tabcolsep}{3.4pt}
 				\renewcommand{\arraystretch}{1.12}
-				\resizebox{0.8\linewidth}{!}{%
+				\resizebox{0.98\linewidth}{!}{%
 				\begin{tabular}{llccccccccc}
 					\toprule
 					\textbf{Bench} & \textbf{Metrics} &
@@ -304,7 +304,9 @@ color=framecolor, fill=blocktitlebgcolor]
 				\item Largest gains appear in \textbf{Recollection}, which heavily depends on integrating prior turns.
 			\end{itemize}
 		}
-		
+		% ==================== 第 3 栏：5-6 ====================
+		\column{0.333}
+
 		\block{\techicon 5. Latency \& Convergence Analysis}{
 			
 			\textbf{Near-Zero Latency Overhead:} Evaluated on 40 simulated dialogues (up to 4,000 tokens) on a single A100 GPU.

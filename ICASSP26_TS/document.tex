@@ -1,4 +1,4 @@
-\documentclass[25pt, a0paper, portrait]{tikzposter}
+\documentclass[25pt, a0paper, landscape]{tikzposter}
 \usepackage{amsmath, amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -9,8 +9,10 @@
 \usepackage[most]{tcolorbox}
 
 \makeatletter
-\setlength{\TP@blockverticalspace}{18mm}
-\setlength{\TP@colspace}{18mm}
+\setlength{\TP@visibletextwidth}{\dimexpr\textwidth-2\TP@innermargin\relax}
+\setlength{\TP@visibletextheight}{\dimexpr\textheight-2\TP@innermargin\relax}
+\setlength{\TP@blockverticalspace}{12mm}
+\setlength{\TP@colspace}{14mm}
 \makeatother
 
 \renewcommand{\familydefault}{\sfdefault}
@@ -161,16 +163,22 @@ color=framecolor, fill=blocktitlebgcolor]
 
 % --- 标题信息 ---
 \title{%
-    \parbox[l]{0.15\linewidth}{\centering\raisebox{-0.5\height}{\safeimageheight{6cm}{logo.png}{Soochow Univ}}}%
-    \parbox[l]{0.70\linewidth}{\centering \textbf{\huge RELATIVE TIME INTERVALS REPRESENTATION \\ FOR WORD-LEVEL TIMESTAMPING \\ WITH MASKED TRAINING}}%
-    \parbox[l]{0.15\linewidth}{\centering\raisebox{-0.5\height}{\safeimageheight{6cm}{suda.png}{AISpeech}}}%
+    \parbox[c]{0.15\linewidth}{\centering\safeimageheight{6cm}{logo.png}{Soochow Univ}}%
+    \parbox[c]{0.70\linewidth}{\centering \textbf{\huge RELATIVE TIME INTERVALS REPRESENTATION \\ FOR WORD-LEVEL TIMESTAMPING \\ WITH MASKED TRAINING}}%
+    \parbox[c]{0.15\linewidth}{\centering\safeimageheight{6cm}{suda.png}{AISpeech}}%
     }
 \author{\Large Quanwei Tang$^{1}$, Zhiyu Tang$^{2}$, Xu Li$^{3}$, Dong Zhang$^{1,\dagger}$, Shoushan Li$^{1}$, Guodong Zhou$^{1}$}
 \institute{$^{1}$Soochow University \quad $^{2}$University of Queensland \quad $^{3}$AISpeech Ltd, Suzhou, China}
 
 \begin{document}
     
-    \maketitle
+\maketitle
+
+\begin{columns}
+
+    % ==================== 左侧双列：痛点与方法 ====================
+    \column{0.666}
+
 	\block{\techicon 1. Motivation \& Limitations}{
 		\begin{center}
 		\begin{minipage}[c]{0.485\linewidth}
@@ -204,11 +212,26 @@ color=framecolor, fill=blocktitlebgcolor]
             \includegraphics[width=0.95\linewidth]{method.pdf}
         \end{center}
     }
-    
-    \begin{columns}
-        
-        % ==================== 左栏：痛点与方法 ====================
-        \column{0.5}
+
+    \block{\techicon 6. Conclusion}{
+        \begin{center}
+            \begin{minipage}[c]{0.76\linewidth}
+                We propose a novel framework addressing core challenges in precise temporal sequence understanding for Speech LLMs.
+                \begin{itemize}
+                    \item \textbf{Beyond simple tagging:} Endows LLMs with fine-grained, aligned multi-modal spatiotemporal understanding capabilities.
+                    \item \textbf{Highly Scalable:} Compact vocabulary enables robust timestamping for \textit{arbitrarily long audio} without degradation.
+                    \item \textbf{Mutual Enhancement:} Temporal alignment regularization actively improves standard ASR performance.
+                \end{itemize}
+            \end{minipage}\hfill
+            \begin{minipage}[c]{0.18\linewidth}
+                \centering
+                \includegraphics[width=4.5cm]{qr.png}
+            \end{minipage}
+        \end{center}
+    }
+
+    % ==================== 右侧单列：实验 ====================
+    \column{0.334}
         
         \block{\techicon 3. Training Strategies \& Fine-Tuning}{
             
@@ -233,10 +256,6 @@ color=framecolor, fill=blocktitlebgcolor]
             \end{itemize}
         }
         
-        % ==================== 右栏：实验与结论 ====================
-        \column{0.5}
-        
-
         \block{\techicon 4. Main Results}{
             
             \textbf{Our method sets a new SOTA for timestamp prediction while significantly improving ASR (WER).}
@@ -245,9 +264,9 @@ color=framecolor, fill=blocktitlebgcolor]
                 \vspace{0.35cm}
                 \centering
                 {\scriptsize
-                \setlength{\tabcolsep}{4pt}
+                \setlength{\tabcolsep}{3.4pt}
                 \renewcommand{\arraystretch}{1.15}
-                \resizebox{0.95\linewidth}{!}{%
+                \resizebox{0.98\linewidth}{!}{%
                 \begin{tabular}{l c c c c c}
                     \toprule
                     \textbf{Model} & \textbf{Tolerance} & \textbf{Precision} & \textbf{Recall} & \textbf{Avg. Diff} & \textbf{WER (\%)} \\
@@ -311,19 +330,5 @@ color=framecolor, fill=blocktitlebgcolor]
         %         \end{minipage}
         %     \end{center}
         % }
-    \end{columns}
-
-	\block{\techicon 6. Conclusion}{
-		\begin{minipage}[l]{0.9\linewidth}
-			We propose a novel framework addressing core challenges in precise temporal sequence understanding for Speech LLMs.
-			\begin{itemize}
-				\item \textbf{Beyond simple tagging:} Endows LLMs with fine-grained, aligned multi-modal spatiotemporal understanding capabilities.
-				\item \textbf{Highly Scalable:} Compact vocabulary enables robust timestamping for \textit{arbitrarily long audio} without degradation.
-				\item \textbf{Mutual Enhancement:} Temporal alignment regularization actively improves standard ASR performance.
-			\end{itemize}
-			\end{minipage}\hfill
-		\begin{minipage}[c]{0.1\linewidth}
-				\includegraphics[width=6cm]{qr.png}
-		\end{minipage}
-	}
+\end{columns}
 \end{document}
