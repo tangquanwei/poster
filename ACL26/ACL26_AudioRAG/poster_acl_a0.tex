@@ -48,10 +48,14 @@
 
 \newlength{\posterMargin}
 \setlength{\posterMargin}{3.2cm}
+\newlength{\contentWidth}
+\setlength{\contentWidth}{\dimexpr\paperwidth-2\posterMargin\relax}
 \newlength{\columnGap}
 \setlength{\columnGap}{1.55cm}
 \newlength{\mainColumn}
-\setlength{\mainColumn}{0.303\paperwidth}
+\setlength{\mainColumn}{\dimexpr(\contentWidth-2\columnGap)/3\relax}
+\newlength{\wideColumn}
+\setlength{\wideColumn}{\dimexpr2\mainColumn+\columnGap\relax}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.36em}
@@ -144,6 +148,21 @@
   #1
 }
 
+\newtcolorbox{headerbox}[1][]{
+  enhanced,
+  colback=AppleLight,
+  colframe=AppleLight,
+  boxrule=0pt,
+  arc=0mm,
+  left=18pt,
+  right=18pt,
+  top=18pt,
+  bottom=18pt,
+  before skip=0pt,
+  after skip=0pt,
+  #1
+}
+
 \newenvironment{posterlist}{
   \begin{itemize}
     \setlength{\itemsep}{0.32em}
@@ -157,16 +176,20 @@
 \newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
 \newcolumntype{C}{>{\Centering\arraybackslash}X}
 
+\newenvironment{postercontent}{%
+  \par\noindent\hspace*{\dimexpr(\linewidth-\contentWidth)/2\relax}%
+  \begin{minipage}{\contentWidth}%
+}{%
+  \end{minipage}\par
+}
+
 \begin{document}
 \begin{frame}[t]
 
-\begin{tikzpicture}[remember picture,overlay]
-  \fill[AppleLight] (current page.north west) rectangle ([yshift=-18.7cm]current page.north east);
-  \draw[AppleLine,line width=0.5pt] ([yshift=-18.7cm]current page.north west) -- ([yshift=-18.7cm]current page.north east);
-\end{tikzpicture}
-
-\vspace*{-0.7cm}
-\begin{columns}[t,totalwidth=\dimexpr\paperwidth-2\posterMargin\relax]
+\vspace*{0.25cm}
+\begin{headerbox}
+\begin{postercontent}
+\begin{columns}[t,totalwidth=\linewidth]
 \begin{column}{0.73\linewidth}
   \posterTitle{Don't Just Listen, Try Planning}
   \vspace{0.33cm}
@@ -216,9 +239,12 @@
   Plan over semantic, speaker, timestamp, and acoustic evidence instead of retrieving one flat chunk.}
 \end{column}
 \end{columns}
+\end{postercontent}
+\end{headerbox}
 
-\vspace{1.35cm}
-\begin{columns}[t,totalwidth=\dimexpr\paperwidth-2\posterMargin\relax]
+\vspace{1.15cm}
+\begin{postercontent}
+\begin{columns}[t,totalwidth=\linewidth]
 
 \begin{column}{\mainColumn}
   \begin{posterbox}
@@ -233,11 +259,36 @@
       \centering
       \includegraphics[width=0.96\linewidth]{figure/intro.pdf}
     \end{whitebox}
-    \vspace{0.25cm}
-    {\smallText\color{AppleGray}
-    GRGA indexes conversation along semantic, speaker, timestamp, and acoustic dimensions, enabling grounded reasoning over dispersed evidence.}
+    % \vspace{0.25cm}
+    % {\smallText\color{AppleGray}
+    % GRGA indexes conversation along semantic, speaker, timestamp, and acoustic dimensions.}
   \end{posterbox}
+\end{column}
+\hspace{\columnGap}
 
+\begin{column}{\wideColumn}
+  \begin{posterbox}
+    \sectionTitle{GRGA: Graph Retrieval + Planning}
+    \begin{whitebox}
+      \centering
+      \includegraphics[width=0.98\linewidth]{figure/method.pdf}
+    \end{whitebox}
+    \vspace{0.2cm}
+    \begin{posterlist}
+      \item Audio is converted into utterance nodes with text, speaker, timestamps, and audio references.
+      \item Edges encode temporal adjacency, reply-to relations, same-speaker links, entity co-occurrence, and semantic coreference.
+      \item The agent decomposes each query, plans tool calls, executes graph retrieval, synthesizes an answer, then reflects for support.
+    \end{posterlist}
+  \end{posterbox}
+\end{column}
+\end{columns}
+\end{postercontent}
+
+\vspace{0.3cm}
+\begin{postercontent}
+\begin{columns}[t,totalwidth=\linewidth]
+
+\begin{column}{\mainColumn}
   \begin{posterbox}
     \sectionTitle{LongAudioQA}
     \begin{posterlist}
@@ -277,22 +328,34 @@
       \bottomrule
     \end{tabularx}
   \end{posterbox}
-\end{column}
 
-\begin{column}{\mainColumn}
   \begin{posterbox}
-    \sectionTitle{GRGA: Graph Retrieval + Planning}
+    \sectionTitle{Robustness Under Noise}
     \begin{whitebox}
       \centering
-      \includegraphics[width=0.99\linewidth]{figure/method.pdf}
+      \includegraphics[width=0.96\linewidth]{figure/heatmaps_3panel.pdf}
     \end{whitebox}
-    \vspace{0.2cm}
     \begin{posterlist}
-      \item Audio is converted into utterance nodes with text, speaker, timestamps, and audio references.
-      \item Edges encode temporal adjacency, reply-to relations, same-speaker links, entity co-occurrence, and semantic coreference.
-      \item The agent decomposes each query, plans tool calls, executes graph retrieval, synthesizes an answer, then reflects for support.
+      \item Text RAG degrades sharply as ASR and diarization noise increase.
+      \item GRGA acts as a structured noise buffer by validating evidence through graph links and reflection.
     \end{posterlist}
   \end{posterbox}
+
+  \begin{posterbox}
+    \sectionTitle{Conclusion}
+    {\fontsize{28}{34}\selectfont\bfseries\color{AppleBlue}
+    Long-form audio QA needs planning, not just listening.\par}
+    \vspace{0.35cm}
+    \begin{posterlist}
+      \item \textbf{Dataset:} LongAudioQA introduces long-context, multi-speaker, temporal, and acoustic-aware QA.
+      \item \textbf{Method:} GRGA turns meetings into multi-dimensional graphs and solves QA through tool-using agent planning.
+      \item \textbf{Evidence:} Improvements appear in accuracy, citation precision/recall, human groundedness, and noisy settings.
+    \end{posterlist}
+  \end{posterbox}
+\end{column}
+\hspace{\columnGap}
+
+\begin{column}{\mainColumn}
 
   \begin{posterbox}
     \sectionTitle{Reasoning Loop}
@@ -352,7 +415,51 @@
       \item Acoustic-aware questions selectively access raw audio when transcripts are insufficient.
     \end{posterlist}
   \end{posterbox}
+
+  \begin{posterbox}
+    \sectionTitle{Self-Correction Case}
+    \begin{whitebox}
+      \smallText
+      \textbf{Query:} ``What is the team's general attitude to the project deadline and workload?''\par
+      \vspace{0.35cm}
+      \begin{tabularx}{\linewidth}{>{\bfseries}p{0.24\linewidth}Y}
+        \toprule
+        Initial answer & Generic summary: the deadline is tight and members feel urgency. \\
+        Reflection & Low confidence; needs concrete evidence for ``tight'' and ``work-intensive''. \\
+        Re-plan & Search for deadline and workload sentiment; retrieve specific utterances. \\
+        Final answer & Cites ``six days'', ``change the deadlines'', ``a hassle'', and ``superficially''. \\
+        \bottomrule
+      \end{tabularx}
+    \end{whitebox}
+    \begin{posterlist}
+      \item Reflection converts unsupported fluent text into evidence-seeking behavior.
+      \item Final response is anchored to exact utterance-level citations.
+    \end{posterlist}
+  \end{posterbox}
+
+  \begin{posterbox}
+    \sectionTitle{Ablation Highlights}
+    \smallText
+    \begin{tabularx}{\linewidth}{Ycc}
+      \toprule
+      \textbf{Removed Component} & \textbf{Avg.} & \textbf{Drop} \\
+      \midrule
+      Full GRGA & \textbf{49.49} & -- \\
+      w/o Reflection & 39.64 & -9.84 \\
+      w/o Graph Traversal & 38.21 & -11.27 \\
+      w/o Audio Access & 34.71 & -14.78 \\
+      w/o Semantic Search & 16.28 & -33.21 \\
+      \bottomrule
+    \end{tabularx}
+    \vspace{0.35cm}
+    \begin{posterlist}
+      \item Semantic search finds entry evidence; graph traversal connects dispersed clues.
+      \item Audio access is crucial for acoustic-aware questions.
+      \item Reflection prevents accepting unsupported first-pass answers.
+    \end{posterlist}
+  \end{posterbox}
 \end{column}
+\hspace{\columnGap}
 
 \begin{column}{\mainColumn}
   \begin{posterbox}
@@ -431,103 +538,18 @@
     \end{columns}
   \end{posterbox}
 
-  \begin{posterbox}
-    \sectionTitle{Ablation Highlights}
-    \smallText
-    \begin{tabularx}{\linewidth}{Ycc}
-      \toprule
-      \textbf{Removed Component} & \textbf{Avg.} & \textbf{Drop} \\
-      \midrule
-      Full GRGA & \textbf{49.49} & -- \\
-      w/o Reflection & 39.64 & -9.84 \\
-      w/o Graph Traversal & 38.21 & -11.27 \\
-      w/o Audio Access & 34.71 & -14.78 \\
-      w/o Semantic Search & 16.28 & -33.21 \\
-      \bottomrule
-    \end{tabularx}
-    \vspace{0.35cm}
-    \begin{posterlist}
-      \item Semantic search finds entry evidence; graph traversal connects dispersed clues.
-      \item Audio access is crucial for acoustic-aware questions.
-      \item Reflection prevents accepting unsupported first-pass answers.
-    \end{posterlist}
-  \end{posterbox}
-\end{column}
-
-\end{columns}
-
-\vspace{0.55cm}
-\begin{columns}[t,totalwidth=\dimexpr\paperwidth-2\posterMargin\relax]
-\begin{column}{\mainColumn}
-  \begin{posterbox}
-    \sectionTitle{Robustness Under Noise}
-    \begin{whitebox}
-      \centering
-      \includegraphics[width=0.96\linewidth]{figure/heatmaps_3panel.pdf}
-    \end{whitebox}
-    \begin{posterlist}
-      \item Text RAG degrades sharply as ASR and diarization noise increase.
-      \item GRGA acts as a structured noise buffer by validating evidence through graph links and reflection.
-    \end{posterlist}
-  \end{posterbox}
-\end{column}
-
-\begin{column}{\mainColumn}
-  \begin{posterbox}
-    \sectionTitle{Self-Correction Case}
-    \begin{whitebox}
-      \smallText
-      \textbf{Query:} ``What is the team's general attitude to the project deadline and workload?''\par
-      \vspace{0.35cm}
-      \begin{tabularx}{\linewidth}{>{\bfseries}p{0.24\linewidth}Y}
-        \toprule
-        Initial answer & Generic summary: the deadline is tight and members feel urgency. \\
-        Reflection & Low confidence; needs concrete evidence for ``tight'' and ``work-intensive''. \\
-        Re-plan & Search for deadline and workload sentiment; retrieve specific utterances. \\
-        Final answer & Cites ``six days'', ``change the deadlines'', ``a hassle'', and ``superficially''. \\
-        \bottomrule
-      \end{tabularx}
-    \end{whitebox}
-    \begin{posterlist}
-      \item Reflection converts unsupported fluent text into evidence-seeking behavior.
-      \item Final response is anchored to exact utterance-level citations.
-    \end{posterlist}
-  \end{posterbox}
-\end{column}
-
-\begin{column}{\mainColumn}
-  \begin{posterbox}
-    \sectionTitle{Conclusion}
-    {\fontsize{28}{34}\selectfont\bfseries\color{AppleBlue}
-    Long-form audio QA needs planning, not just listening.\par}
-    \vspace{0.35cm}
-    \begin{posterlist}
-      \item \textbf{Dataset:} LongAudioQA introduces long-context, multi-speaker, temporal, and acoustic-aware QA.
-      \item \textbf{Method:} GRGA turns meetings into multi-dimensional graphs and solves QA through tool-using agent planning.
-      \item \textbf{Evidence:} Improvements appear in accuracy, citation precision/recall, human groundedness, and noisy settings.
-    \end{posterlist}
-    \vspace{0.25cm}
-    \begin{whitebox}
-      \miniTitle{Future Directions}
-      \vspace{0.25cm}
-      \smallText\color{AppleGray}
-      Reduce iterative latency, strengthen upstream robustness, and extend beyond structured meetings to broader long-form audio.
-    \end{whitebox}
-  \end{posterbox}
 \end{column}
 \end{columns}
+\end{postercontent}
 
 \vfill
-\begin{tikzpicture}[remember picture,overlay]
-  \node[anchor=south west, xshift=\posterMargin, yshift=1.2cm] at (current page.south west) {
-    {\fontsize{17}{21}\selectfont\color{AppleGray}
-    ACL 2026 Poster \quad | \quad LongAudioQA and GRGA \quad | \quad Corresponding author: Dong Zhang}
-  };
-  \node[anchor=south east, xshift=-\posterMargin, yshift=1.2cm] at (current page.south east) {
-    {\fontsize{17}{21}\selectfont\color{AppleGray}
-    Code/Data: github.com/tangquanwei/GRGA}
-  };
-\end{tikzpicture}
+\begin{postercontent}
+  {\fontsize{17}{21}\selectfont\color{AppleGray}
+  ACL 2026 Poster \quad | \quad LongAudioQA and GRGA \quad | \quad Corresponding author: Dong Zhang
+  \hfill
+  Code/Data: github.com/tangquanwei/GRGA\par}
+\end{postercontent}
+\vspace*{0.35cm}
 
 \end{frame}
 \end{document}
