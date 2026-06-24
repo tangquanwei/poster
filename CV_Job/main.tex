@@ -1,0 +1,195 @@
+\documentclass[10pt,a4paper,withhyper,normalphoto]{altacv}
+\geometry{left=1.25cm,right=1.25cm,top=1.5cm,bottom=1.5cm,columnsep=1.2cm}
+\usepackage{paracol}
+\usepackage{xeCJK}
+\setmainfont{Roboto}
+\setsansfont{Roboto}
+\renewcommand{\familydefault}{\sfdefault}
+
+% colors
+\definecolor{SlateGrey}{HTML}{2E2E2E}
+\definecolor{LightGrey}{HTML}{666666}
+\definecolor{DarkPastelRed}{HTML}{450808}
+\definecolor{PastelRed}{HTML}{8F0D0D}
+\definecolor{GoldenEarth}{HTML}{E7D192}
+\colorlet{name}{black}
+\colorlet{tagline}{PastelRed}
+\colorlet{heading}{DarkPastelRed}
+\colorlet{headingrule}{GoldenEarth}
+\colorlet{subheading}{PastelRed}
+\colorlet{accent}{PastelRed}
+\colorlet{emphasis}{SlateGrey}
+\colorlet{body}{LightGrey}
+
+% Change some fonts, if necessary
+\renewcommand{\namefont}{\Huge\rmfamily\bfseries}
+\renewcommand{\personalinfofont}{\footnotesize}
+\renewcommand{\cvsectionfont}{\LARGE\rmfamily\bfseries}
+\renewcommand{\cvsubsectionfont}{\large\bfseries}
+
+
+% Change the bullets for itemize and rating marker
+% for \cvskill if you want to
+\renewcommand{\cvItemMarker}{{\small\textbullet}}
+\renewcommand{\cvRatingMarker}{\faCircle}
+
+
+\begin{document}
+\name{唐权威}
+\tagline{Quanwei Tang}
+%% You can add multiple photos on the left or right
+\photoR{3cm}{photo}
+% \photoL{2.5cm}{Yacht_High,Suitcase_High}
+
+\personalinfo{%
+  % Not all of these are required!
+  \email{1076451802@qq.com}
+  \phone{17790556197}
+  \homepage{blog.quanwei.fun}
+  \github{tangquanwei}
+  \printinfo{}{}
+
+}
+\mynames{Quanwei/Tang}
+
+\makecvheader
+%% Depending on your tastes, you may want to make fonts of itemize environments slightly smaller
+% \AtBeginEnvironment{itemize}{\small}
+
+%% Set the left/right column width ratio to 6:4.
+\columnratio{0.7}
+
+% Start a 2-column paracol. Both the left and right columns will automatically
+% break across pages if things get too long.
+\begin{paracol}{2}
+\cvsection{实习}
+
+\cvevent{会议软件攻关 RD}{AISpeech 思必驰}{2025/04 - 2025/09}{苏州}
+\begin{itemize}
+\item \textbf{时间戳大模型训练}~ 实现"LLM生成时间戳，精确召回提升10\%+
+\item \textbf{热词大模型训练}~ 多模态知识融合：结合语音和文本知识，降低语音识别错误率，提升语音问答准确率。
+\item \textbf{检索推理大模型训练}~ 可解释性增强：输出外部知识引用路径，确保知识引用可溯源。
+\end{itemize}
+
+\divider
+
+\cvevent{APA System RD}{Momenta 魔门塔}{2025/09 -- 2026/01}{苏州}
+\begin{itemize}
+\item \textbf{Agent开发} ~ 设计并开发任务流自动化 Agent，实现从任务提交提交、状态追踪到结果反馈的闭环处理，大幅降低跨平台操作的心智负担与响应延迟。
+\item \textbf{自动FIT-Checker开发} ~ 构建高度自动化的开发工作流，输入需求文档，输出开发文档和PR。Agent根据需求文档查资料、写文档、写代码、测试、提交代码，人工只需要审核代码合入主线。开发了一系列 Fit-Checker 平均 P\&R >90\%，大大减少了人工检查的时间。
+\end{itemize}
+
+\divider
+
+\cvevent{会议软件攻关 RD}{AISpeech 思必驰}{2026/01 - 2026/06}{苏州}
+\begin{itemize}
+\item \textbf{语音-热词检索模型训练} ~ 面向“给定语音与候选热词集合，识别语音中真实出现热词”任务，研发语音-热词跨模态检索方法，
+避免传统 ASR 转写后文本匹配带来的误差传递。引入 CIF 将连续语音帧压缩为接近文本 token 粒度的 acoustic tokens，
+并设计长度感知的滑动窗口匹配机制，使用 token-level Text MaxSim 在整句语音中定位并识别短热词片段。
+训练阶段结合局部对比学习损失、CIF quantity 约束和 token-level 辅助对齐目标，
+同时优化 batch 构造以过滤潜在 false negative，提升跨模态检索的稳定性。
+\end{itemize}
+
+
+\cvsection{项目}
+
+% \cvevent{Metaverse Essentials}{}{2023/06 - 2023/07}{}
+% \begin{itemize}
+% \item 全栈开发（Spring Cloud + Next.js）接口设计（输出42个标准化RESTful API） 
+% \item 后端：Spring Cloud微服务架构，MySQL数据库JPA动态查询优化SQL 40% 
+% \item 前端：Next.js SSR方案提升首屏性能（Lighthouse评分62→89），封装JWT自动刷新机制 
+% \item 质量：Swagger+CI/CD自动化文档，Postman实现100\%接口覆盖
+% \end{itemize}
+% \divider
+
+% \cvevent{基于大语言模型的医药问答研究(本科毕设)}{}{2023/12 -- 2024/05}{}
+% \begin{itemize}
+%     \item 为了缓解通用 LLM 在特定领域的幻觉问题。通过 \textbf{LoRA} 微调 \textbf{ChatGLM-6B}，实现了领域知识注入，准确率相对基线提升 \textbf{10\%}。
+%     \item 构建了包含 \textbf{15,000} 组 QA 对的高质量数据集（清洗自 \textbf{100k+} 原始数据），引入人工校验机制确保数据质量。
+%     \item 设计检索增强生成（\textbf{RAG}）框架，利用 \textbf{BGE-M3} 生成语义向量并结合 \textbf{FAISS} 索引，实现 \textbf{98\%} 的 Top-5 召回率。
+%     \item 工程化落地：通过 \textbf{4-bit} 量化压缩模型显存占用，成功在 CPU 端部署，实现 \textbf{2s} 内的端到端推理响应。
+% \end{itemize}
+
+% \divider
+
+% \cvevent{素材质量评估及提纲写作开发实施项目}{}{2023/10 -- 2024/01}{}
+% \begin{itemize}
+%     \item \textbf{大模型新闻续写}：基于 \textbf{Pangu-Alpha 200B} 预训练模型，设计\textbf{主题相似性微调任务}（Theme Similarity Fine-tuning），通过计算输入内容的语义相似度实现自适应主题划分，解决了长文本生成的连贯性问题。
+%     \item \textbf{智能文本纠错}：研发“规则+深度学习”的混合纠错引擎，利用\textbf{自监督学习}策略对模型进行微调，实现对生成内容的自动化语法纠错与润色。
+%     \item \textbf{风险溯源与审计}：引入 \textbf{GNNExplainer} 技术生成传播热力图，对生成内容进行可解释性分析与风险溯源，最终输出符合\textbf{电网安全审计要求}的质量评估报告。
+% \end{itemize}
+% \divider
+
+\cvevent{多模态知识图谱 - 作业风险管控系统}{}{2023/12 -- 2024/07}{}
+\begin{itemize}
+    \item \textbf{多模态图谱构建}：基于 Neo4j 构建“设备-环境-人员-流程”四维异构图谱，融合结构化数据与非结构化数据，包含 5000+ 个风险实体节点。
+    \item \textbf{多源算法融合}：采用 YOLOv7 实时识别现场违规行为（如未佩戴安全装备），结合 BiLSTM-CRF 模型从操作规范文档中抽取实体，实现视觉与文本信息的知识化对齐。
+    \item \textbf{可解释性风控}：应用 GNNExplainer 生成风险传播热力图，对潜在风险路径进行溯源分析，生成符合电网安全审计标准的评估报告。
+    \item \textbf{业务闭环}：建立了“事前评估--事中监控--事后复盘”的全流程管控机制，成功推动电网基建场景下的事故率降低 30\%+。
+\end{itemize}
+
+
+\switchcolumn
+
+\cvsection{教育}
+
+\cvevent{苏州大学}{NLP Lab ~ 硕士}{2024/09 - 2027/06}{}
+
+\divider
+
+\cvevent{兰州交通大学}{软件工程 ~ 本科}{2020/09 - 2024/06}{}
+  
+\begin{itemize}
+\item \textbf{专业排名：} 1/76 ~ \textbf{GPA：}3.89/4
+\item \textbf{CTE-4:} 558 ~ \textbf{CET-6:} 478   
+\end{itemize}
+
+\cvsection{论文}
+
+\begin{itemize}
+    \item \textbf{Quanwei Tang}, S. Y. M. Lee, J. Wu, D. Zhang$^*$, S. Li, E. Cambria, and G. Zhou. \\
+    \textit{A Comprehensive Graph Framework for Question Answering with Mode-Seeking Preference Alignment}. \\
+    \textbf{ACL 2025 Findings}.
+\end{itemize}
+\begin{itemize}
+    \item \textbf{Quanwei Tang}, Z. Tang, X. Li, D. Zhang$^*$, S. Li, and G. Zhou. \\
+    \textit{Relative Time Intervals Representation for Word-level Timestamping with Masked Training}. \\
+    \textbf{ICASSP 2026}.
+\end{itemize}
+\begin{itemize}
+    \item J. Peng, Y. Yang, X. Li, Y. Xi, \textbf{Quanwei Tang},  Y. Fang, J. Li, and K. Yu. \\
+    \textit{TASU: Text-Only Alignment for Speech Understanding}. \\
+    \textbf{ICASSP 2026}.
+\end{itemize}
+\begin{itemize}
+    \item \textbf{Quanwei Tang}, D. Zhang$^*$, S. Li, and G. Zhou. \\
+    \textit{Don’t Just Listen, Try Planning: Graph-based Retrieval-Generation Agent for Long-form Audio Meeting Understanding}. \\
+    \textbf{ACL 2026 Findings}.
+\end{itemize}
+
+\cvsection{技能}
+
+\cvtag{PyTorch}
+\cvtag{Linux}
+\cvtag{Docker}
+\cvtag{VibeCoding}
+% \cvtag{Pandas}
+% \cvtag{Matplotlib}
+% \cvtag{PostgreSQL/PGVector}
+% \cvtag{FastAPI}
+% \cvtag{NumPy}
+% \cvtag{Java}
+% \cvtag{Spring}
+% \cvtag{JPA}
+
+% \divider\smallskip
+
+% \cvtag{Linux}
+% \cvtag{Docker}
+% \cvtag{VibeCoding}
+% \cvtag{Neo4j}
+
+\end{paracol}
+
+
+\end{document}

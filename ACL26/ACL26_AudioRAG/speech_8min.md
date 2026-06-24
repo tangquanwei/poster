@@ -2,7 +2,7 @@
 
 ## Slide 1: Title
 
-Good morning everyone.
+Hello everyone.
 
 I am Quanwei Tang from Soochow University.
 
