@@ -1,0 +1,208 @@
+\documentclass[10pt,a4paper,withhyper,normalphoto]{altacv}
+\geometry{left=1.15cm,right=1.15cm,top=1.1cm,bottom=1.1cm,columnsep=1.0cm}
+\usepackage{paracol}
+\usepackage{xeCJK}
+\setmainfont{Roboto}
+\setsansfont{Roboto}
+\renewcommand{\familydefault}{\sfdefault}
+
+% colors
+\definecolor{SlateGrey}{HTML}{2E2E2E}
+\definecolor{LightGrey}{HTML}{666666}
+\definecolor{DarkPastelRed}{HTML}{450808}
+\definecolor{PastelRed}{HTML}{8F0D0D}
+\definecolor{GoldenEarth}{HTML}{E7D192}
+\colorlet{name}{black}
+\colorlet{tagline}{PastelRed}
+\colorlet{heading}{DarkPastelRed}
+\colorlet{headingrule}{GoldenEarth}
+\colorlet{subheading}{PastelRed}
+\colorlet{accent}{PastelRed}
+\colorlet{emphasis}{SlateGrey}
+\colorlet{body}{LightGrey}
+
+% Change some fonts, if necessary
+\renewcommand{\namefont}{\Huge\rmfamily\bfseries}
+\renewcommand{\personalinfofont}{\footnotesize}
+\renewcommand{\cvsectionfont}{\Large\rmfamily\bfseries}
+\renewcommand{\cvsubsectionfont}{\large\bfseries}
+
+
+% Change the bullets for itemize and rating marker
+% for \cvskill if you want to
+\renewcommand{\cvItemMarker}{{\small\textbullet}}
+\renewcommand{\cvRatingMarker}{\faCircle}
+\setlist{leftmargin=*,labelsep=0.45em,nosep,itemsep=0.12\baselineskip,topsep=0pt,after=\vspace{0.08\baselineskip}}
+\renewcommand{\divider}{\textcolor{body!30}{\hdashrule{\linewidth}{0.6pt}{0.5ex}}\smallskip}
+\renewcommand{\cvevent}[4]{%
+  {\normalsize\color{emphasis}#1\par}
+  \vspace{0.15ex}
+  \ifstrequal{#2}{}{}{
+  \textbf{\color{accent}#2}\par
+  \vspace{0.15ex}}
+  \ifstrequal{#3}{}{}{%
+    {\small\makebox[0.5\linewidth][l]%
+      {\BeginAccSupp{method=pdfstringdef,ActualText={\datename:}}\cvDateMarker\EndAccSupp{}%
+      ~#3}%
+    }}%
+  \ifstrequal{#4}{}{}{%
+    {\small\makebox[0.5\linewidth][l]%
+      {\BeginAccSupp{method=pdfstringdef,ActualText={\locationname:}}\cvLocationMarker\EndAccSupp{}%
+        ~#4}%
+    }}\par
+  \smallskip\normalsize
+}
+
+
+\begin{document}
+\name{唐权威}
+\tagline{LLM / RAG / Agent Algorithm}
+%% You can add multiple photos on the left or right
+\photoR{2.8cm}{photo}
+% \photoL{2.5cm}{Yacht_High,Suitcase_High}
+
+\personalinfo{%
+  % Not all of these are required!
+  \email{1076451802@qq.com}
+  \phone{17790556197}
+  \homepage{blog.quanwei.fun}
+  \github{tangquanwei}
+  \printinfo{}{}
+
+}
+\mynames{Quanwei/Tang}
+
+\makecvheader
+%% Keep dense project bullets readable on one page.
+\AtBeginEnvironment{itemize}{\small}
+
+%% Set the left/right column width ratio to 6:4.
+\columnratio{0.7}
+
+% Start a 2-column paracol. Both the left and right columns will automatically
+% break across pages if things get too long.
+\begin{paracol}{2}
+\cvsection{实习}
+
+\cvevent{会议理解大模型 RD}{AISpeech 思必驰}{2025/04 - 2025/09}{苏州}
+\begin{itemize}
+\item \textbf{LLM 时间戳建模}：基于会议转写与音频对齐数据构造 SFT 任务，让 LLM 生成词级/句级时间戳，精确召回提升 10\%+，并沉淀 bad case 分析流程。
+\item \textbf{热词与知识增强}：融合语音、文本和业务热词知识，优化热词召回与语音问答效果；针对识别错误构建清洗样本，降低 ASR 误差传递。
+\item \textbf{检索推理链路}：参与外部知识检索与引用路径生成，使回答可追溯；关注 RAG 场景下的 chunking、召回和 rerank 调优。
+\end{itemize}
+
+\divider
+
+\cvevent{APA System / Agent RD}{Momenta 魔门塔}{2025/09 -- 2026/01}{苏州}
+\begin{itemize}
+\item \textbf{Agent 工作流}：基于 LangChain/LangGraph 思路设计任务流自动化 Agent，串联需求解析、资料检索、多工具调用、状态追踪和结果反馈，降低跨平台操作成本。
+\item \textbf{自动 FIT-Checker}：构建从需求文档到开发文档、代码修改、测试和 PR 的自动化链路；实现一系列 Fit-Checker，平均 P\&R $>$ 90\%，显著减少人工检查时间。
+\end{itemize}
+
+\divider
+
+\cvevent{语音-热词跨模态检索 RD}{AISpeech 思必驰}{2026/01 - 2026/06}{苏州}
+\begin{itemize}
+\item \textbf{跨模态检索建模}：面向“语音中真实出现热词识别”任务，研发语音-热词检索方法，绕开 ASR 转写后文本匹配的误差传递。
+\item \textbf{Token 对齐与训练}：引入 CIF 将连续语音帧压缩为 acoustic tokens，设计长度感知滑窗与 token-level Text MaxSim；结合局部对比学习、CIF quantity 约束和辅助对齐目标训练。
+\item \textbf{数据工程与 Error Analysis}：优化 batch 构造以过滤潜在 false negative，基于 bad case 定位召回/误报来源，提升跨模态检索稳定性。
+\end{itemize}
+
+
+\cvsection{项目}
+
+% \cvevent{Metaverse Essentials}{}{2023/06 - 2023/07}{}
+% \begin{itemize}
+% \item 全栈开发（Spring Cloud + Next.js）接口设计（输出42个标准化RESTful API） 
+% \item 后端：Spring Cloud微服务架构，MySQL数据库JPA动态查询优化SQL 40% 
+% \item 前端：Next.js SSR方案提升首屏性能（Lighthouse评分62→89），封装JWT自动刷新机制 
+% \item 质量：Swagger+CI/CD自动化文档，Postman实现100\%接口覆盖
+% \end{itemize}
+% \divider
+
+\cvevent{基于大语言模型的医药问答 RAG 研究}{本科毕设}{2023/12 -- 2024/05}{}
+\begin{itemize}
+    \item \textbf{领域微调}：使用 LoRA/QLoRA 微调 ChatGLM-6B，完成医药 QA 领域知识注入，准确率较基线提升 10\%。
+    \item \textbf{检索增强生成}：清洗 100k+ 原始数据得到 15,000 组 QA，使用 BGE-M3 向量化并结合 FAISS 索引，Top-5 召回率达到 98\%。
+    \item \textbf{量化部署}：通过 4-bit 量化压缩模型显存占用，支持 CPU 端 2s 内端到端响应。
+\end{itemize}
+
+\divider
+
+% \cvevent{素材质量评估及提纲写作开发实施项目}{}{2023/10 -- 2024/01}{}
+% \begin{itemize}
+%     \item \textbf{大模型新闻续写}：基于 \textbf{Pangu-Alpha 200B} 预训练模型，设计\textbf{主题相似性微调任务}（Theme Similarity Fine-tuning），通过计算输入内容的语义相似度实现自适应主题划分，解决了长文本生成的连贯性问题。
+%     \item \textbf{智能文本纠错}：研发“规则+深度学习”的混合纠错引擎，利用\textbf{自监督学习}策略对模型进行微调，实现对生成内容的自动化语法纠错与润色。
+%     \item \textbf{风险溯源与审计}：引入 \textbf{GNNExplainer} 技术生成传播热力图，对生成内容进行可解释性分析与风险溯源，最终输出符合\textbf{电网安全审计要求}的质量评估报告。
+% \end{itemize}
+% \divider
+
+\cvevent{多模态知识图谱 - 作业风险管控系统}{}{2023/12 -- 2024/07}{}
+\begin{itemize}
+    \item \textbf{非结构化解析}：基于 Neo4j 构建“设备-环境-人员-流程”四维异构图谱，融合文档、视觉和结构化数据，沉淀 5000+ 风险实体。
+    \item \textbf{视觉文本对齐}：使用 YOLOv7 识别现场违规行为，结合 BiLSTM-CRF 从操作规范中抽取实体，实现多模态信息知识化。
+    \item \textbf{可解释分析}：应用 GNNExplainer 生成风险传播路径和审计报告，支撑“事前评估--事中监控--事后复盘”闭环，事故率降低 30\%+。
+\end{itemize}
+
+
+\switchcolumn
+
+\cvsection{教育}
+
+\cvevent{苏州大学}{NLP Lab ~ 硕士}{2024/09 - 2027/06}{}
+
+\divider
+
+\cvevent{兰州交通大学}{软件工程 ~ 本科}{2020/09 - 2024/06}{}
+  
+\begin{itemize}
+\item \textbf{专业排名：} 1/76 ~ \textbf{GPA：}3.89/4
+\item \textbf{CTE-4:} 558 ~ \textbf{CET-6:} 478   
+\end{itemize}
+
+\cvsection{论文}
+
+\begin{itemize}
+    \item \textbf{ACL 2026 Findings（一作）}：\textit{Don't Just Listen, Try Planning: Graph-based Retrieval-Generation Agent for Long-form Audio Meeting Understanding}.
+    \item \textbf{ACL 2025 Findings（一作）}：\textit{A Comprehensive Graph Framework for Question Answering with Mode-Seeking Preference Alignment}.
+    \item \textbf{ICASSP 2026（一作）}：\textit{Relative Time Intervals Representation for Word-level Timestamping with Masked Training}.
+    \item \textbf{ICASSP 2026（合作）}：\textit{TASU: Text-Only Alignment for Speech Understanding}.
+\end{itemize}
+
+\cvsection{技能}
+
+\cvtag{Python}
+\cvtag{PyTorch}
+\cvtag{Transformer}
+\cvtag{SFT/RLHF}
+\cvtag{LoRA/QLoRA}
+\cvtag{RAG}
+\cvtag{Milvus/Pinecone}
+\cvtag{LangChain/LangGraph}
+\cvtag{Agent}
+\cvtag{TensorRT-LLM}
+\cvtag{Neo4j}
+\cvtag{Git}
+\cvtag{Linux}
+\cvtag{Docker}
+\cvtag{Error Analysis}
+% \cvtag{Pandas}
+% \cvtag{Matplotlib}
+% \cvtag{PostgreSQL/PGVector}
+% \cvtag{FastAPI}
+% \cvtag{NumPy}
+% \cvtag{Java}
+% \cvtag{Spring}
+% \cvtag{JPA}
+
+% \divider\smallskip
+
+% \cvtag{Linux}
+% \cvtag{Docker}
+% \cvtag{VibeCoding}
+% \cvtag{Neo4j}
+
+\end{paracol}
+
+
+\end{document}
