@@ -1,0 +1,17 @@
+# LaTeX build outputs
+build/
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Temporary check PDFs
+*_methodcheck.pdf
+*_equationcheck.pdf
