@@ -1,0 +1,173 @@
+\documentclass[10pt,a4paper,withhyper,normalphoto]{altacv}
+\geometry{left=1.15cm,right=1.15cm,top=1.05cm,bottom=1.05cm,columnsep=1.0cm}
+\usepackage{paracol}
+\usepackage{xeCJK}
+\setmainfont{Roboto}
+\setsansfont{Roboto}
+\renewcommand{\familydefault}{\sfdefault}
+
+% colors
+\definecolor{SlateGrey}{HTML}{2E2E2E}
+\definecolor{LightGrey}{HTML}{666666}
+\definecolor{DarkPastelRed}{HTML}{450808}
+\definecolor{PastelRed}{HTML}{8F0D0D}
+\definecolor{GoldenEarth}{HTML}{E7D192}
+\colorlet{name}{black}
+\colorlet{tagline}{PastelRed}
+\colorlet{heading}{DarkPastelRed}
+\colorlet{headingrule}{GoldenEarth}
+\colorlet{subheading}{PastelRed}
+\colorlet{accent}{PastelRed}
+\colorlet{emphasis}{SlateGrey}
+\colorlet{body}{LightGrey}
+
+% fonts
+\renewcommand{\namefont}{\Huge\rmfamily\bfseries}
+\renewcommand{\personalinfofont}{\footnotesize}
+\renewcommand{\cvsectionfont}{\Large\rmfamily\bfseries}
+\renewcommand{\cvsubsectionfont}{\large\bfseries}
+
+% compact layout
+\renewcommand{\cvItemMarker}{{\small\textbullet}}
+\renewcommand{\cvRatingMarker}{\faCircle}
+\setlist{leftmargin=*,labelsep=0.45em,nosep,itemsep=0.10\baselineskip,topsep=0pt,after=\vspace{0.06\baselineskip}}
+\renewcommand{\divider}{\textcolor{body!30}{\hdashrule{\linewidth}{0.6pt}{0.5ex}}\smallskip}
+\renewcommand{\cvevent}[4]{%
+  {\normalsize\color{emphasis}#1\par}
+  \vspace{0.15ex}
+  \ifstrequal{#2}{}{}{
+  \textbf{\color{accent}#2}\par
+  \vspace{0.15ex}}
+  \ifstrequal{#3}{}{}{%
+    {\small\makebox[0.5\linewidth][l]%
+      {\BeginAccSupp{method=pdfstringdef,ActualText={\datename:}}\cvDateMarker\EndAccSupp{}%
+      ~#3}%
+    }}%
+  \ifstrequal{#4}{}{}{%
+    {\small\makebox[0.5\linewidth][l]%
+      {\BeginAccSupp{method=pdfstringdef,ActualText={\locationname:}}\cvLocationMarker\EndAccSupp{}%
+        ~#4}%
+    }}\par
+  \smallskip\normalsize
+}
+
+\begin{document}
+\name{唐权威}
+\tagline{Multimodal LLM · Speech-Text Retrieval · RAG / Agent}
+\photoR{2.8cm}{photo}
+
+\personalinfo{%
+  \email{1076451802@qq.com}
+  \phone{17790556197}
+  \homepage{blog.quanwei.fun}
+  \github{tangquanwei}
+  \printinfo{}{}
+}
+\mynames{Quanwei/Tang}
+
+\makecvheader
+\AtBeginEnvironment{itemize}{\small}
+\columnratio{0.70}
+
+\begin{paracol}{2}
+\cvsection{实习经历}
+
+\cvevent{会议大模型算法研发实习生}{AISpeech 思必驰}{2025/04 -- 2025/09}{苏州}
+\begin{itemize}
+    \item \textbf{词级时间戳建模}：参与会议场景下 word-level timestamping 模型训练与评测，优化 LLM 生成时间戳方案，精确召回提升 \textbf{10\%+}。
+    \item \textbf{热词增强语音理解}：融合语音证据、候选热词与文本知识，降低 ASR 误识别对下游问答的误差传递，提升会议问答在领域实体上的稳定性。
+    \item \textbf{可溯源检索推理}：构建外部知识检索与引用路径输出机制，使模型答案能够关联到检索证据，增强会议问答结果的可解释性与可核查性。
+\end{itemize}
+
+\divider
+
+\cvevent{APA System / Agent 研发实习生}{Momenta 魔门塔}{2025/09 -- 2026/01}{苏州}
+\begin{itemize}
+    \item \textbf{研发流程 Agent}：设计任务流自动化 Agent，打通任务提交、状态追踪、结果反馈与异常提示，减少跨平台人工操作与信息同步成本。
+    \item \textbf{自动 FIT-Checker}：构建“需求文档 $\rightarrow$ 开发文档 $\rightarrow$ 代码实现 $\rightarrow$ 测试 $\rightarrow$ PR”的自动化工作流，人类主要负责代码审核与主线合入。
+    \item \textbf{质量评估与落地}：开发多类 FIT-Checker，平均 Precision / Recall 超过 \textbf{90\%}，显著减少人工规则检查与回归验证时间。
+\end{itemize}
+
+\divider
+
+\cvevent{语音-热词跨模态检索算法实习生}{AISpeech 思必驰}{2026/01 -- 2026/06}{苏州}
+\begin{itemize}
+    \item \textbf{端到端语音热词检索}：面向“语音中真实出现热词识别”任务，构建不依赖完整 ASR 转写的 speech-hotword retrieval 框架，缓解文本匹配链路的误差传递。
+    \item \textbf{Acoustic Token 对齐}：基于 CIF 将连续语音帧压缩为 acoustic tokens，结合长度感知滑窗与 token-level MaxSim，实现短热词片段与文本 token 的细粒度匹配。
+    \item \textbf{训练诊断与优化}：联合 local contrastive loss、CIF quantity loss 与 token-level 辅助对齐目标训练；分析 batch 内 false negative，优化采样与 bad case 诊断流程。
+    \item \textbf{效果与性能}：中文测试集 F1 达到 \textbf{96\%+}，英文测试集 F1 达到 \textbf{85\%+}；30s 语音、2k 候选热词检索延迟低于 \textbf{200ms}。
+\end{itemize}
+
+\cvsection{项目经历}
+
+\cvevent{Token-Level 后交互语音-热词检索}{语音-文本跨模态检索}{2026/01 -- 2026/06}{}
+\begin{itemize}
+    \item \textbf{问题建模}：将语音热词检索建模为局部声学片段与候选文本 token 的跨模态匹配问题，避免先转写再字符串匹配带来的级联错误。
+    \item \textbf{方法设计}：借鉴 ColBERT late interaction，引入 CIF acoustic tokenization、长度感知 local window 与 Text MaxSim，使模型保留 token 级匹配证据而非仅依赖全局 pooling 表示。
+    \item \textbf{训练策略}：实现 Stage1 CIF 对齐预训练与 Stage2 联合检索训练；针对多正例、子串热词与 batch false negative 设计诊断实验和加权训练策略。
+\end{itemize}
+
+\divider
+
+\cvevent{基于大语言模型的医药问答 RAG 系统}{本科毕业设计}{2023/12 -- 2024/05}{}
+\begin{itemize}
+    \item \textbf{领域模型训练}：基于 LoRA / QLoRA 微调 ChatGLM-6B，完成医药 QA 场景的领域知识注入，准确率较基线提升 \textbf{10\%}。
+    \item \textbf{检索增强生成}：清洗 100k+ 原始数据并构建 15,000 组 QA，使用 BGE-M3 向量化并结合 FAISS 建立索引，Top-5 召回率达到 \textbf{98\%}。
+    \item \textbf{低资源部署}：通过 4-bit 量化压缩显存占用，支持 CPU 端 2s 内端到端响应，提升系统在低算力环境下的可用性。
+\end{itemize}
+
+\switchcolumn
+
+\cvsection{教育背景}
+
+\cvevent{苏州大学}{NLP Lab · 硕士研究生}{2024/09 -- 2027/06}{}
+\begin{itemize}
+    \item 研究方向：多模态大模型、语音理解、RAG / Agent、跨模态检索。
+\end{itemize}
+
+\divider
+
+\cvevent{兰州交通大学}{软件工程 · 本科}{2020/09 -- 2024/06}{}
+\begin{itemize}
+    \item \textbf{专业排名：}1/76 \quad \textbf{GPA：}3.89/4
+    \item \textbf{CET-4：}558 \quad \textbf{CET-6：}478
+\end{itemize}
+
+\cvsection{论文发表}
+
+\begin{itemize}
+    \item \textbf{ACL Findings 2026（一作）}：\textit{Don't Just Listen, Try Planning: Graph-based Retrieval-Generation Agent for Long-form Audio Meeting Understanding}.
+    \item \textbf{ACL Findings 2025（一作）}：\textit{A Comprehensive Graph Framework for Question Answering with Mode-Seeking Preference Alignment}.
+    \item \textbf{ICASSP 2026（一作）}：\textit{Relative Time Intervals Representation for Word-level Timestamping with Masked Training}.
+    \item \textbf{ICASSP 2026（合作）}：\textit{TASU: Text-Only Alignment for Speech Understanding}.
+\end{itemize}
+
+\cvsection{技术栈}
+
+\cvsubsection{大模型训练}
+\cvtag{PyTorch}
+\cvtag{DeepSpeed}
+\cvtag{LoRA / QLoRA}
+\cvtag{SFT / DPO}
+\cvtag{Contrastive Learning}
+\cvtag{Error Analysis}
+
+\smallskip
+\cvsubsection{语音与多模态}
+\cvtag{Multimodal LLM}
+\cvtag{Audio-Text Alignment}
+\cvtag{CIF}
+\cvtag{Speech Retrieval}
+\cvtag{RAG}
+
+\smallskip
+\cvsubsection{检索与部署}
+\cvtag{FAISS / Milvus}
+\cvtag{Neo4j}
+\cvtag{ONNX}
+\cvtag{TensorRT}
+\cvtag{Agent}
+
+\end{paracol}
+
+\end{document}

@@ -1,0 +1,349 @@
+\documentclass[UTF8,fontset=fandol]{ctexart}
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  citecolor=blue!60!black,
+  urlcolor=blue!60!black
+}
+
+\setlist[itemize]{leftmargin=2em,itemsep=0.25em}
+\setlist[enumerate]{leftmargin=2em,itemsep=0.25em}
+\renewcommand{\arraystretch}{1.25}
+
+\title{语音大模型文献综述：从语音编码到上下文感知语音识别}
+\author{Quanwei}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+本文围绕语音大模型的核心设计问题，对 SALMONN、SpeechGPT、AudioPaLM、Qwen-Audio、WavLLM、Seed-ASR、MaLa-ASR 以及若干基于 LLM 的上下文语音识别工作进行重新梳理。不同于逐篇论文罗列，本文采用问题驱动的综述方式，重点讨论：输入语音服务于什么任务、语音如何编码、语音表示如何接入大语言模型、是否需要离散语音 token、是否需要建模非语义信息、LoRA 应在什么阶段训练，以及上下文提示如何参与 ASR。最后，本文结合已有文献归纳出一个面向热词与上下文提示的语音大模型训练路线，即先建立语音到 LLM 的基础对齐，再进行指令 ASR 微调，之后引入热词、上下文和多任务训练，最终扩展到长音频会议转写。
+\end{abstract}
+
+\section{Introduction}
+
+近年来，大语言模型（Large Language Model, LLM）在文本理解、生成和推理任务上表现出强大的通用能力。语音大模型的基本思想是：将语音编码为可以被 LLM 接收的表示，使 LLM 不仅能处理文本输入，也能理解语音、音频事件、音乐，甚至进行语音对话。
+
+但是，语音大模型并不是一个单一问题。不同论文的目标差异很大：有些工作关注 ASR，有些关注语音翻译，有些希望做通用音频理解，有些进一步希望模型能够输出语音。因此，在设计一个具体语音大模型之前，需要先回答以下几个问题：
+
+\begin{itemize}
+  \item 输入语音用于什么任务：ASR、ST、音频问答、说话人日志，还是语音对话？
+  \item 语音如何编码：使用 Whisper、HuBERT、WavLM、w2v-BERT，还是 CTC/Conformer ASR encoder？
+  \item 语音编码如何输入 LLM：直接输入、Linear/MLP、Q-Former、Cross-Attention，还是 CTC 压缩器？
+  \item 需要语义信息还是非语义信息：只关心``说了什么''，还是还关心``谁在说''、``怎么说''、``环境是什么''？
+  \item 是否需要离散化语音 token：模型是否需要统一语音和文本 token 空间，甚至输出语音？
+  \item LLM 如何微调：只训练 adapter，还是同时训练 LoRA？
+  \item 训练分几个阶段：预训练、对齐、指令微调、上下文微调、多任务微调如何安排？
+\end{itemize}
+
+这些问题共同决定了模型架构和训练策略。对于本文关注的目标，即构建一个带热词和上下文提示能力的语音识别模型，最重要的并不是一开始追求通用音频理解，而是先解决语音表示与 LLM 的对齐、上下文提示的有效注入，以及 ASR 任务上的稳定生成。
+
+\section{任务定位：输入语音用于什么任务？}
+
+从已有文献看，语音输入大致服务于三类任务。
+
+\begin{longtable}{p{0.18\linewidth}p{0.28\linewidth}p{0.42\linewidth}}
+\toprule
+任务类型 & 代表工作 & 主要特点 \\
+\midrule
+ASR/ST 专用型 & Seed-ASR~\cite{bai2024seed}, MaLa-ASR~\cite{yang2024mala}, End-to-End Speech Recognition Contextualization~\cite{lakomkin2024contextual}, Decoder-only Speech-to-Text~\cite{wu2023decoder} & 主要关注语音识别、语音翻译和上下文 ASR。目标明确，训练数据通常是语音-文本对或上下文-语音-文本三元组。 \\
+\midrule
+通用音频理解型 & SALMONN~\cite{tang2023salmonn}, Qwen-Audio~\cite{chu2023qwen}, WavLLM~\cite{hu2024wavllm}, X-LLM~\cite{chen2023xllm} & 除 ASR 外，还关注音频事件、音乐、音频问答、情感识别等任务。模型需要同时建模语义信息和非语义信息。 \\
+\midrule
+语音输入输出型 & SpeechGPT~\cite{zhang2023speechgpt}, AudioPaLM~\cite{rubenstein2023audiopalm} & 希望模型能够同时接受文本和语音输入，并输出文本或语音。通常需要离散语音 token 或语音 codec token。 \\
+\bottomrule
+\end{longtable}
+
+对于带热词提示的 ASR，任务可以抽象为条件生成问题：
+
+$$
+P(y \mid x, c)=\prod_{t=1}^{T}P(y_t \mid y_{<t}, x, c)
+$$
+
+其中，$x$ 表示输入语音，$c$ 表示上下文提示，例如热词列表、领域信息或前文文本，$y$ 表示目标转写文本，$y_t$ 表示第 $t$ 个输出 token，$y_{<t}$ 表示第 $t$ 个 token 之前已经生成的 token 序列，$T$ 表示输出文本长度，$P(y \mid x,c)$ 表示模型在给定语音和上下文时生成完整转写文本的概率。
+
+这个公式说明，热词提示 ASR 的核心不是单独做语音识别，也不是单独做文本补全，而是让模型在生成每个 token 时同时利用语音证据和上下文提示。换句话说，模型必须学会判断：某个热词是否真的被语音支持，而不是机械地把提示词抄进结果。
+
+\section{语音编码：连续表示还是离散 token？}
+
+\subsection{连续语音表示}
+
+大多数面向 ASR 或 ST 的语音大模型使用连续语音表示。典型做法是先用语音编码器提取帧级或下采样后的表示：
+
+$$
+H_s = E_s(x)
+$$
+
+其中，$E_s$ 表示语音编码器，$x$ 表示输入语音，$H_s \in \mathbb{R}^{L_s \times d_s}$ 表示语音编码结果，$L_s$ 是语音表示长度，$d_s$ 是语音编码器输出维度。
+
+常见语音编码器包括：
+
+\begin{itemize}
+  \item Whisper encoder：具有较强 ASR 语义能力，适合语音识别和语音翻译。
+  \item HuBERT：通过自监督聚类学习语音单元，常用于离散语音 token 或语音理解。
+  \item WavLM：对说话人、韵律和声学细节更敏感，适合说话人相关任务。
+  \item w2v-BERT/USM：Google 系列语音预训练模型，在 AudioPaLM 中被用于多语种语音任务。
+  \item CTC/Conformer encoder：通过 ASR 监督训练，具有更明确的语音-文本对齐结构。
+\end{itemize}
+
+如果目标是短期构建热词提示 ASR，Whisper encoder 是一个合理起点，因为它已经包含较强的语音语义信息，能够降低训练成本。但如果后续要加入说话人日志，则可以考虑引入 WavLM 或专门的 speaker encoder。
+
+\subsection{离散语音 token}
+
+SpeechGPT 和 AudioPaLM 代表另一条路线：把语音离散化为 token，使语音和文本可以放在统一 token 空间中建模。例如：
+
+$$
+z_1,z_2,\ldots,z_N = Q(E_s(x))
+$$
+
+其中，$E_s$ 是语音编码器，$Q$ 是量化器或离散化模块，$z_i$ 表示第 $i$ 个离散语音 token，$N$ 表示离散 token 数量。
+
+离散化的优点是可以让 LLM 类似处理文本一样处理语音 token，并支持语音输出。但它也会引入额外问题：离散 token 是否保留足够的语义信息、是否丢失细粒度声学信息、token 序列是否过长、训练是否需要大量语音生成数据。
+
+因此，对于当前以文本输出为主的热词 ASR，不必优先采用离散语音 token。连续表示加 adapter 更直接，也更容易验证上下文提示是否有效。
+
+\section{语音表示如何接入 LLM？}
+
+语音编码器输出的维度、长度和分布通常与 LLM 的文本 embedding 空间不一致。因此，需要一个连接器将语音表示映射到 LLM 可处理的空间：
+
+$$
+Z = A(H_s)
+$$
+
+其中，$A$ 表示连接器，$H_s$ 是语音编码器输出，$Z \in \mathbb{R}^{L_z \times d_{\text{llm}}}$ 表示输入 LLM 的语音 token 表示，$L_z$ 是映射后的语音 token 长度，$d_{\text{llm}}$ 是 LLM 的 hidden size。
+
+\begin{longtable}{p{0.18\linewidth}p{0.25\linewidth}p{0.25\linewidth}p{0.2\linewidth}}
+\toprule
+接入方式 & 代表工作 & 优点 & 局限 \\
+\midrule
+直接输入 & Qwen-Audio, 部分 ASR-LLM 工作 & 结构简单，端到端直接 & 对齐压力大，训练不稳定风险高 \\
+\midrule
+Linear/MLP & MaLa-ASR, Seed-ASR & 轻量、易训练、适合 ASR & 表达能力有限，对长音频压缩不足 \\
+\midrule
+Q-Former & SALMONN, Connecting Speech Encoder and LLM & 可以压缩语音长度，学习查询式表示 & 结构复杂，需要更多训练数据 \\
+\midrule
+Cross-Attention & WavLLM, PPLM & 融合能力强，可以让文本侧动态关注语音 & 参数更多，训练和推理成本更高 \\
+\midrule
+CTC 压缩器 & Decoder-only Speech-to-Text & 利用 CTC 去除 blank 和冗余帧 & 依赖 CTC 对齐质量，可能损失细节 \\
+\bottomrule
+\end{longtable}
+
+对于热词提示 ASR，可以优先选择 Linear/MLP adapter。原因是该任务的第一阶段目标不是最大化模型复杂度，而是验证语音表示能否被 LLM 稳定读取，以及热词提示是否能改变识别结果。
+
+\section{LLM 选择与架构创新}
+
+已有工作中常见的 LLM 包括 Vicuna、LLaMA、Qwen、PaLM、ChatGLM 等。不同 LLM 的选择通常与语言覆盖、模型规模、开源程度和训练成本有关。
+
+对于中文热词提示 ASR，Qwen 是合理选择。其优势包括中文能力较强、指令跟随能力较好、生态较完整。模型整体结构可以写为：
+
+$$
+\hat{y} = \mathrm{LLM}_{\theta}(Z, c)
+$$
+
+其中，$\hat{y}$ 表示模型生成的转写结果，$\mathrm{LLM}_{\theta}$ 表示参数为 $\theta$ 的大语言模型，$Z$ 表示语音 adapter 输出，$c$ 表示上下文提示。
+
+如果采用 LoRA，则不是直接更新全部参数 $\theta$，而是在部分线性层中加入低秩增量：
+
+$$
+W' = W + \Delta W = W + BA
+$$
+
+其中，$W$ 表示原始权重矩阵，$W'$ 表示加入 LoRA 后的等效权重，$\Delta W$ 表示低秩更新矩阵，$A \in \mathbb{R}^{r \times d_{\text{in}}}$ 和 $B \in \mathbb{R}^{d_{\text{out}} \times r}$ 是可训练低秩矩阵，$r$ 是 LoRA rank，$d_{\text{in}}$ 是输入维度，$d_{\text{out}}$ 是输出维度。
+
+LoRA 的作用不是替代语音 adapter，而是让 LLM 更好地适应语音条件生成任务。更合理的策略是：先训练 adapter 建立语音到 LLM 空间的基础对齐，再引入 LoRA 学习 ASR 指令、热词提示和上下文使用方式。
+
+\section{训练阶段：从基础对齐到上下文 ASR}
+
+不同论文的训练阶段差异较大。SALMONN 使用预训练、指令微调和 activation tuning；SpeechGPT 使用模态适配预训练、跨模态指令微调和 Chain-of-Modality 微调；Seed-ASR 包括 SSL、SFT、Context SFT 和强化学习；Qwen-Audio 采用多任务预训练和监督微调。
+
+这些工作可以归纳出一个共同规律：如果任务越通用，训练阶段越多；如果任务越专用，训练目标可以更集中。
+
+\begin{longtable}{p{0.15\linewidth}p{0.22\linewidth}p{0.24\linewidth}p{0.27\linewidth}}
+\toprule
+阶段 & 训练数据 & 训练对象 & 目标 \\
+\midrule
+Stage 0：基础 ASR 对齐 & 普通语音-文本对 & 冻结语音 encoder 和 LLM，只训练 adapter & 让语音表示能够进入 LLM 并被正确解码为文本 \\
+\midrule
+Stage 1：指令 ASR & ASR instruction 数据 & adapter + 少量 LoRA & 让模型理解不同 ASR 指令模板 \\
+\midrule
+Stage 2：热词/上下文 ASR & 语音 + 热词列表 + 转写文本 & adapter + LoRA & 让模型学会利用上下文提示，同时避免无根据地复制热词 \\
+\midrule
+Stage 3：多任务扩展 & ASR、ST、说话人日志等任务 & 多任务 LoRA 或分任务 adapter & 扩展到语音翻译、说话人日志等任务 \\
+\midrule
+Stage 4：长音频会议转写 & 长音频、会议数据、chunk 级标注 & 长上下文模块、memory 模块或 chunk-level 训练 & 解决长音频连续转写和跨片段一致性问题 \\
+\bottomrule
+\end{longtable}
+
+其中，Stage 2 是热词提示 ASR 的关键阶段。训练样本不应只包含真实热词，还应包含干扰热词。否则模型可能学会看到提示就复制，而不是根据语音证据选择。
+
+Stage 2 的训练目标可以写成：
+
+$$
+\mathcal{L}_{\text{SFT}}
+=
+-\sum_{t=1}^{T}\log P_{\theta}(y_t \mid y_{<t}, Z, c)
+$$
+
+其中，$\mathcal{L}_{\text{SFT}}$ 表示监督微调损失，$\theta$ 表示可训练参数，$T$ 表示输出序列长度，$y_t$ 表示第 $t$ 个目标 token，$y_{<t}$ 表示历史目标 token，$Z$ 表示语音表示，$c$ 表示上下文提示。
+
+\section{Prompt 多样化与上下文提示设计}
+
+对于上下文 ASR，prompt 设计非常关键。Prompt 的作用不是装饰输入，而是显式告诉模型：当前语音可能与哪些上下文词相关。
+
+可以使用如下几类 prompt：
+
+\begin{longtable}{p{0.22\linewidth}p{0.68\linewidth}}
+\toprule
+Prompt 类型 & 示例 \\
+\midrule
+直接热词提示 & 请识别这段语音，参考热词：\{hotwords\}。 \\
+\midrule
+领域上下文提示 & 这是一段技术会议语音，以下术语可能出现：\{hotwords\}。请完成转写。 \\
+\midrule
+候选词选择提示 & 请根据语音内容判断候选词中哪些真实出现，并输出完整转写：\{hotwords\}。 \\
+\midrule
+无提示对照 & 请转写这段语音。 \\
+\bottomrule
+\end{longtable}
+
+Prompt 多样化的目的有两个：第一，避免模型过拟合某一种固定模板；第二，让模型学习上下文提示的抽象功能，而不是记忆表面句式。
+
+但是，prompt 多样化不能代替数据构造。热词列表中必须包含负例和相似干扰项。例如目标语音中出现``Qwen-Audio''，候选列表可以同时包含``Qwen-Audio''、``Qwen2-Audio''、``AudioPaLM''、``WavLLM''。这样模型才需要依赖语音证据，而不是只依赖提示先验。
+
+\section{语义信息与非语义信息}
+
+ASR 和 ST 主要需要语义信息，即``说了什么''。但说话人日志、情感识别、音频事件理解需要非语义信息，即``谁在说''、``怎么说''、``环境是什么''。
+
+可以将语音信息分为两类：
+
+\begin{itemize}
+  \item 语义信息：词、句子、语义内容、领域术语。
+  \item 非语义信息：说话人身份、情绪、韵律、音色、背景声、音乐事件。
+\end{itemize}
+
+如果只做热词 ASR，Whisper encoder 足够作为起点。如果要加入说话人日志，可以考虑双编码器结构：
+
+$$
+H = [E_{\text{sem}}(x); E_{\text{spk}}(x)]
+$$
+
+其中，$E_{\text{sem}}$ 表示语义语音编码器，例如 Whisper；$E_{\text{spk}}$ 表示说话人或声学编码器，例如 WavLM；$[\,;\,]$ 表示特征拼接；$H$ 表示融合后的语音表示。
+
+这说明，中期扩展时不能只把所有任务简单混在一起训练。不同任务依赖的信息类型不同，模型结构和数据构造也应该有所区分。
+
+\section{面向当前方案的设计建议}
+
+结合上述文献，当前方案可以定位为：
+
+\begin{quote}
+构建一个面向上下文感知 ASR 的语音大模型，采用 Whisper 提取语义语音表示，通过轻量连接器映射到 Qwen 的输入空间，并在基础 ASR 对齐后使用 LoRA 进行热词和上下文指令微调。短期聚焦短音频热词识别，中期扩展到 ASR、ST 和说话人日志，长期处理会议长音频连续转写。
+\end{quote}
+
+推荐架构如下：
+
+$$
+x \xrightarrow{\,\text{Whisper Encoder}\,} H_s
+\xrightarrow{\,\text{Linear/MLP Adapter}\,} Z
+\xrightarrow{\,\text{Qwen + LoRA}\,} y
+$$
+
+其中，$x$ 是输入语音，$H_s$ 是 Whisper encoder 输出，$Z$ 是映射到 Qwen hidden size 的语音 token 表示，$y$ 是输出转写文本。
+
+推荐训练顺序如下：
+
+\begin{enumerate}
+  \item 先冻结 Whisper 和 Qwen，只训练 Linear/MLP adapter，验证基础 ASR 是否能收敛。
+  \item 再加入 ASR instruction，让模型适应``请转写这段语音''等指令形式。
+  \item 然后加入热词和上下文提示，训练模型区分真实出现的热词和干扰热词。
+  \item 最后再考虑 ST、说话人日志和长音频会议场景。
+\end{enumerate}
+
+这个路线的好处是每个阶段都有清晰验证目标。Stage 0 验证语音-文本对齐，Stage 1 验证指令跟随，Stage 2 验证上下文提示是否有效，Stage 3 和 Stage 4 再扩展复杂能力。
+
+\section{总结}
+
+现有语音大模型文献表明，模型设计必须从任务目标出发。如果目标是通用音频理解，需要同时建模语义和非语义信息；如果目标是语音输入输出对话，则需要离散语音 token 或 codec token；如果目标是上下文 ASR，则应优先解决语音编码、LLM 接入、上下文提示和稳定微调。
+
+对于当前热词提示 ASR 目标，最稳妥的路线是：使用 Whisper encoder 提取连续语音表示，通过 Linear/MLP adapter 对齐到 Qwen 输入空间，先训练 adapter 建立基础语音-文本映射，再使用 LoRA 进行指令 ASR 和热词上下文微调。Prompt 需要多样化，但更关键的是热词数据必须包含正例、负例和相似干扰项。只有这样，模型才能学会基于语音证据使用上下文，而不是简单复制提示词。
+
+\begin{thebibliography}{99}
+
+\bibitem{bai2024seed}
+Ye Bai, Jingping Chen, Jitong Chen, et al.
+\newblock Seed-ASR: Understanding Diverse Speech and Contexts with LLM-based Speech Recognition.
+\newblock 2024.
+
+\bibitem{chen2023xllm}
+Feilong Chen, Minglun Han, Haozhi Zhao, Qingyang Zhang, Jing Shi, Shuang Xu, and Bo Xu.
+\newblock X-LLM: Bootstrapping Advanced Large Language Models by Treating Multi-Modalities as Foreign Languages.
+\newblock 2023.
+
+\bibitem{chu2023qwen}
+Yunfei Chu, Jin Xu, Xiaohuan Zhou, et al.
+\newblock Qwen-Audio: Advancing Universal Audio Understanding via Unified Large-Scale Audio-Language Models.
+\newblock 2023.
+
+\bibitem{fathullah2024prompting}
+Yassir Fathullah, Chunyang Wu, Egor Lakomkin, et al.
+\newblock Prompting Large Language Models with Speech Recognition Abilities.
+\newblock In ICASSP, 2024.
+
+\bibitem{hu2024wavllm}
+Shujie Hu, Long Zhou, Shujie Liu, et al.
+\newblock WavLLM: Towards Robust and Adaptive Speech Large Language Model.
+\newblock 2024.
+
+\bibitem{lakomkin2024contextual}
+Egor Lakomkin, Chunyang Wu, Yassir Fathullah, et al.
+\newblock End-to-End Speech Recognition Contextualization with Large Language Models.
+\newblock In ICASSP, 2024.
+
+\bibitem{li2023prompting}
+Yuang Li, Yu Wu, Jinyu Li, and Shujie Liu.
+\newblock Prompting Large Language Models for Zero-Shot Domain Adaptation in Speech Recognition.
+\newblock In ASRU, 2023.
+
+\bibitem{rubenstein2023audiopalm}
+Paul K. Rubenstein, Chulayuth Asawaroengchai, Duc Dung Nguyen, et al.
+\newblock AudioPaLM: A Large Language Model That Can Speak and Listen.
+\newblock 2023.
+
+\bibitem{tang2023salmonn}
+Changli Tang, Wenyi Yu, Guangzhi Sun, Xianzhao Chen, Tian Tan, Wei Li, Lu Lu, Zejun Ma, and Chao Zhang.
+\newblock SALMONN: Towards Generic Hearing Abilities for Large Language Models.
+\newblock 2023.
+
+\bibitem{wu2023decoder}
+Jian Wu, Yashesh Gaur, Zhuo Chen, et al.
+\newblock On Decoder-Only Architecture For Speech-to-Text and Large Language Model Integration.
+\newblock In ASRU, 2023.
+
+\bibitem{yang2024mala}
+Guanrou Yang, Ziyang Ma, Fan Yu, Zhifu Gao, Shiliang Zhang, and Xie Chen.
+\newblock MaLa-ASR: Multimedia-Assisted LLM-Based ASR.
+\newblock 2024.
+
+\bibitem{yu2024connecting}
+Wenyi Yu, Changli Tang, Guangzhi Sun, et al.
+\newblock Connecting Speech Encoder and Large Language Model for ASR.
+\newblock In ICASSP, 2024.
+
+\bibitem{zhang2023speechgpt}
+Dong Zhang, Shimin Li, Xin Zhang, Jun Zhan, Pengyu Wang, Yaqian Zhou, and Xipeng Qiu.
+\newblock SpeechGPT: Empowering Large Language Models with Intrinsic Cross-Modal Conversational Abilities.
+\newblock 2023.
+
+\end{thebibliography}
+
+\end{document}
