@@ -11,7 +11,7 @@ LaTeX poster, slide, paper, and CV workspace. This repository keeps conference p
 | `ICASSP26_SIM/` | ICASSP 2026 SIM poster source and assets. |
 | `ICASSP26_TS/` | ICASSP 2026 TS poster source and assets. |
 | `CV_Job/` | LaTeX CV based on `altacv`. |
-| `script/` | Git auto-commit and push helpers for Windows and Unix-like shells. |
+| `script/` | Git auto-commit and push helpers, plus PDF export utilities. |
 | `tmp/` | Temporary working files. This directory is ignored by Git. |
 
 ## Requirements
@@ -63,6 +63,41 @@ latexmk -c
 ```
 
 Run it inside the specific project directory you want to clean. Generated LaTeX auxiliary files are also covered by `.gitignore`.
+
+## PDF to PNG Export
+
+Use `script/pdf_to_png.py` to render PDF pages as PNG images. The script uses PyMuPDF.
+
+Create the conda environment once:
+
+```powershell
+conda create -n pdf2png -c conda-forge python=3.12 pymupdf -y
+```
+
+Export all pages. By default, images are written to a folder named `<pdf_stem>_png` next to the PDF:
+
+```powershell
+conda run -n pdf2png python .\script\pdf_to_png.py .\CV_Job_歌尔\main.pdf
+```
+
+Export selected pages with a custom output directory and DPI:
+
+```powershell
+conda run -n pdf2png python .\script\pdf_to_png.py .\CV_Job_歌尔\main.pdf -o .\tmp\pdf2png_test --dpi 150 -p 1,3-5
+```
+
+Useful options:
+
+- `-o, --output-dir`: output directory.
+- `--dpi`: render resolution, default is `300`.
+- `-p, --pages`: 1-based page selection, such as `1`, `1,3,5`, or `2-4`.
+- `--prefix`: output filename prefix.
+
+Output filenames use this pattern:
+
+```text
+<prefix>_p001.png
+```
 
 ## Git Helper Scripts
 

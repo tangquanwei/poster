@@ -1,0 +1,199 @@
+\documentclass[10pt,a4paper,withhyper,normalphoto]{altacv}
+\geometry{left=1.15cm,right=1.15cm,top=1.1cm,bottom=1.1cm,columnsep=1.0cm}
+\usepackage{paracol}
+\usepackage{xeCJK}
+\setmainfont{Roboto}
+\setsansfont{Roboto}
+\renewcommand{\familydefault}{\sfdefault}
+
+% colors
+\definecolor{SlateGrey}{HTML}{2E2E2E}
+\definecolor{LightGrey}{HTML}{666666}
+\definecolor{DarkPastelRed}{HTML}{450808}
+\definecolor{PastelRed}{HTML}{8F0D0D}
+\definecolor{GoldenEarth}{HTML}{E7D192}
+\colorlet{name}{black}
+\colorlet{tagline}{PastelRed}
+\colorlet{heading}{DarkPastelRed}
+\colorlet{headingrule}{GoldenEarth}
+\colorlet{subheading}{PastelRed}
+\colorlet{accent}{PastelRed}
+\colorlet{emphasis}{SlateGrey}
+\colorlet{body}{LightGrey}
+
+% Change some fonts, if necessary
+\renewcommand{\namefont}{\Huge\rmfamily\bfseries}
+\renewcommand{\personalinfofont}{\footnotesize}
+\renewcommand{\cvsectionfont}{\Large\rmfamily\bfseries}
+\renewcommand{\cvsubsectionfont}{\large\bfseries}
+
+
+% Change the bullets for itemize and rating marker
+% for \cvskill if you want to
+\renewcommand{\cvItemMarker}{{\small\textbullet}}
+\renewcommand{\cvRatingMarker}{\faCircle}
+\setlist{leftmargin=*,labelsep=0.45em,nosep,itemsep=0.12\baselineskip,topsep=0pt,after=\vspace{0.08\baselineskip}}
+\renewcommand{\divider}{\textcolor{body!30}{\hdashrule{\linewidth}{0.6pt}{0.5ex}}\smallskip}
+\renewcommand{\cvevent}[4]{%
+  {\normalsize\color{emphasis}#1\par}
+  \vspace{0.15ex}
+  \ifstrequal{#2}{}{}{
+  \textbf{\color{accent}#2}\par
+  \vspace{0.15ex}}
+  \ifstrequal{#3}{}{}{%
+    {\small\makebox[0.5\linewidth][l]%
+      {\BeginAccSupp{method=pdfstringdef,ActualText={\datename:}}\cvDateMarker\EndAccSupp{}%
+      ~#3}%
+    }}%
+  \ifstrequal{#4}{}{}{%
+    {\small\makebox[0.5\linewidth][l]%
+      {\BeginAccSupp{method=pdfstringdef,ActualText={\locationname:}}\cvLocationMarker\EndAccSupp{}%
+        ~#4}%
+    }}\par
+  \smallskip\normalsize
+}
+
+
+\begin{document}
+\name{唐权威}
+\tagline{Multimodal LLM / Speech-Text Retrieval / Agent Dev}
+%% You can add multiple photos on the left or right
+\photoR{2.8cm}{photo}
+% \photoL{2.5cm}{Yacht_High,Suitcase_High}
+
+\personalinfo{%
+  % Not all of these are required!
+  \email{1076451802@qq.com}
+  \phone{17790556197}
+  \homepage{blog.quanwei.fun}
+  \github{tangquanwei}
+  \printinfo{}{}
+
+}
+\mynames{Quanwei/Tang}
+
+\makecvheader
+%% Keep dense project bullets readable on one page.
+\AtBeginEnvironment{itemize}{\small}
+
+%% Set the left/right column width ratio to 6:4.
+\columnratio{0.7}
+
+% Start a 2-column paracol. Both the left and right columns will automatically
+% break across pages if things get too long.
+\begin{paracol}{2}
+\cvsection{实习}
+
+\cvevent{会议软件攻关 RD}{AISpeech 思必驰}{2025/04 - 2025/09}{苏州}
+\begin{itemize}
+\item \textbf{时间戳大模型训练}~ 实现"LLM生成时间戳，精确召回提升10\%+
+\item \textbf{热词大模型训练}~ 多模态知识融合：结合语音和文本知识，降低语音识别错误率，提升语音问答准确率。
+\item \textbf{检索推理大模型训练}~ 可解释性增强：输出外部知识引用路径，确保知识引用可溯源。
+\end{itemize}
+
+\divider
+
+\cvevent{APA System / Agent RD}{Momenta 魔门塔}{2025/09 -- 2026/01}{苏州}
+\begin{itemize}
+\item \textbf{Agent开发} ~ 设计并开发任务流自动化 Agent，实现从任务提交提交、状态追踪到结果反馈的闭环处理，大幅降低跨平台操作的心智负担与响应延迟。
+\item \textbf{自动FIT-Checker开发} ~ 构建高度自动化的开发工作流，输入需求文档，输出开发文档和PR。Agent根据需求文档查资料、写文档、写代码、测试、提交代码，人工只需要审核代码合入主线。开发了一系列 Fit-Checker 平均 P\&R >90\%，大大减少了人工检查的时间。
+\end{itemize}
+
+\divider
+
+\cvevent{语音-热词跨模态检索 RD}{AISpeech 思必驰}{2026/01 - 2026/06}{苏州}
+\begin{itemize}
+\item \textbf{语音跨模态检索}：面向“语音中真实出现热词识别”任务，研发语音-热词检索方法，在语音流和文本知识之间直接建模，绕开 ASR 文本匹配的误差传递。
+\item \textbf{Acoustic Token 对齐}：引入 CIF 将连续语音帧压缩为 acoustic tokens，设计长度感知滑窗与 token-level Text MaxSim，实现语音片段和文本 token 的细粒度匹配。
+\item \textbf{训练与误差分析}：结合局部对比学习、CIF quantity 约束和辅助对齐目标训练；优化 batch 构造以过滤 false negative，通过 bad case 定位召回/误报来源。
+\end{itemize}
+
+
+\cvsection{项目}
+
+
+\cvevent{基于大语言模型的医药问答 RAG 研究}{本科毕设}{2023/12 -- 2024/05}{}
+\begin{itemize}
+    \item \textbf{领域模型训练}：使用 LoRA/QLoRA 微调 ChatGLM-6B，完成医药 QA 领域知识注入，准确率较基线提升 10\%。
+    \item \textbf{检索增强生成}：清洗 100k+ 原始数据得到 15,000 组 QA，使用 BGE-M3 向量化并结合 FAISS 索引，Top-5 召回率达到 98\%。
+    \item \textbf{低延迟部署}：通过 4-bit 量化压缩模型显存占用，支持 CPU 端 2s 内端到端响应，关注生成内容的精炼性和可用性。
+\end{itemize}
+
+\divider
+
+\cvevent{声学-文本跨模态对齐}{}{2026/01 -- 2026/06}{}
+\begin{itemize}
+    \item \textbf{跨模态检索建模}：面向语音热词检索任务，构建不依赖完整 ASR 转写的声学-文本跨模态检索框架；基于 Paraformer + BERT 双塔结构，实现大规模候选热词检索。
+    \item \textbf{Acoustic Token 对齐}：引入 CIF 将帧级语音表示压缩为 acoustic tokens，通过 quantity loss 约束声学 token 与文本 token 的长度一致性；
+    结合局部滑窗与 token-level MaxSim 定位长语音中的短热词片段。
+    \item \textbf{两阶段训练与诊断}：实现 Stage1 CIF 预训练与 Stage2 联合检索训练，融合 local contrastive loss、CIF loss 和 token-level 辅助对齐目标，
+    并处理 batch 内热词冲突导致的 false negative 问题。
+    \item \textbf{部署与效果}：跑通数据处理、模型训练、量化部署和评估测试全流程；实现中文测试集 F1 96\%+，英文测试集 F1 85\%+，30s 语音、2k 热词检索延迟 $<$200ms。
+\end{itemize}
+
+
+\switchcolumn
+
+\cvsection{教育}
+
+\cvevent{苏州大学}{NLP Lab ~ 硕士}{2024/09 - 2027/06}{}
+
+\divider
+
+\cvevent{兰州交通大学}{软件工程 ~ 本科}{2020/09 - 2024/06}{}
+  
+\begin{itemize}
+\item \textbf{专业排名：} 1/76 ~ \textbf{GPA：}3.89/4
+\item \textbf{CTE-4:} 558 ~ \textbf{CET-6:} 478   
+\end{itemize}
+
+\cvsection{论文}
+
+\begin{itemize}
+    \item \textbf{ACL 2026 Findings（一作）}：\textit{Don't Just Listen, Try Planning: Graph-based Retrieval-Generation Agent for Long-form Audio Meeting Understanding}.
+    \item \textbf{ACL 2025 Findings（一作）}：\textit{A Comprehensive Graph Framework for Question Answering with Mode-Seeking Preference Alignment}.
+    \item \textbf{ICASSP 2026（一作）}：\textit{Relative Time Intervals Representation for Word-level Timestamping with Masked Training}.
+    \item \textbf{ICASSP 2026（合作）}：\textit{TASU: Text-Only Alignment for Speech Understanding}.
+\end{itemize}
+
+\cvsection{技能}
+
+\cvtag{Python}
+\cvtag{PyTorch}
+\cvtag{Deepspeed}
+\cvtag{Multimodal LLM}
+\cvtag{SFT/DPO}
+\cvtag{Audio-Text Alignment}
+\cvtag{Contrastive Learning}
+\cvtag{LoRA/QLoRA}
+\cvtag{CIF}
+\cvtag{RAG}
+\cvtag{FAISS/Milvus}
+\cvtag{Agent}
+\cvtag{Onnx}
+\cvtag{TensorRT}
+\cvtag{Neo4j}
+\cvtag{Git}
+\cvtag{Linux}
+\cvtag{Docker}
+\cvtag{Error Analysis}
+% \cvtag{Pandas}
+% \cvtag{Matplotlib}
+% \cvtag{PostgreSQL/PGVector}
+% \cvtag{FastAPI}
+% \cvtag{NumPy}
+% \cvtag{Java}
+% \cvtag{Spring}
+% \cvtag{JPA}
+
+% \divider\smallskip
+
+% \cvtag{Linux}
+% \cvtag{Docker}
+% \cvtag{VibeCoding}
+% \cvtag{Neo4j}
+
+\end{paracol}
+
+
+\end{document}
