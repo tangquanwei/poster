@@ -1,7 +1,7 @@
 {
   "latex-workshop.latex.rootFile.useSubFile": false,
   "latex-workshop.latex.outDir": "%DIR%/build",
-  "latex-workshop.latex.autoBuild.run": "onSave",
+  "latex-workshop.latex.build.enableMagicComments": false,
   "latex-workshop.latex.recipe.default": "first",
   "latex-workshop.latex.autoClean.run": "onBuilt",
   "latex-workshop.latex.clean.method": "glob",

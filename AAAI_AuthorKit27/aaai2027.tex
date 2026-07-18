@@ -166,7 +166,7 @@
 \maketitle
 
 \begin{abstract}
-AAAI creates proceedings, working notes, and technical reports directly from electronic source furnished by the authors. To ensure that all papers in the publication have a uniform appearance, authors must adhere to the following instructions.
+Speech LLM-based ASR has achieved strong general recognition performance, but remains vulnerable to named entities and long-tail words due to dominant language model priors. Retrieval augmented contextual ASR mitigates this issue by injecting candidate hotwords as prompts, yet its effectiveness critically depends on accurately retrieving short textual entities from long speech utterances under weak supervision. Existing speech-text retrievers often rely on global utterance embeddings or unconstrained local matching, which suffer from representation dilution and alignment drift. We propose a token-level aligned late-interaction retriever for weakly supervised hotword retrieval. The proposed method converts frame-level speech representations into monotonic acoustic tokens, and performs length-aware sliding-window matching between acoustic tokens and hotword text tokens. This design preserves fine-grained entity cues while allowing flexible local alignment without timestamp annotations. We further introduce token-level auxiliary alignment and false-negative-aware batch construction to improve contrastive learning reliability. Experiments on contextual ASR benchmarks show that our method substantially improves hotword retrieval accuracy and reduces both CER and biased-word error rate when used as a retrieval front-end for Speech LLM prompting.
 \end{abstract}
 
 % Uncomment the following to link to your code, datasets, an extended version or similar.
@@ -180,22 +180,22 @@ AAAI creates proceedings, working notes, and technical reports directly from ele
 
 \section{Introduction}
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=1\linewidth]{figure/intro.png}
+  \caption{Comparison of hotword retrieval paradigms. (a) Existing retrievers compress long speech into global embeddings or unconstrained local features, where short hotword cues are diluted or suffer from alignment drift. (b) Our method tokenizes speech into monotonic acoustic tokens via CIF and performs length-aware local late interaction to preserve fine-grained entity details under weak supervision.}
+  \label{fig:intro}
+\end{figure} 
+
 Speech large language models and prompt-based automatic speech recognition (ASR) systems have substantially improved the flexibility of speech understanding. By conditioning recognition on textual prompts or task instructions, these systems can exploit strong internal language priors and adapt to diverse user contexts. However, the same priors also make them vulnerable when recognizing named entities, rare words, and other long-tail expressions. Such words are sparse in training data, often acoustically ambiguous, and may differ from frequent alternatives by only a few phonetic units. As a result, ASR errors on these terms commonly appear as substitutions into high-frequency words, semantically plausible phrases, or similarly pronounced entities.
 
 Retrieval-augmented contextual ASR provides a practical way to address this limitation. Instead of modifying the main ASR model, a retriever selects candidate hotwords from an external vocabulary or contextual source, and the selected candidates are injected into the ASR prompt as biasing context. This paradigm is attractive because it can improve recognition of domain-specific entities while keeping the recognizer fixed. Recent contrastive hotword retrievers have shown the potential of this direction \cite{kong25_interspeech}. Nevertheless, contextual ASR is only as reliable as the retrieved candidates: missing the true entity limits the benefit of prompting, while retrieving confusable false positives may further bias the recognizer toward incorrect words.
 
 Existing speech-text retrieval methods face two challenges in this setting. First, \emph{representation dilution} occurs when a long utterance is compressed into a single global embedding. Since hotwords are often short spans, their acoustic evidence can be overwhelmed by surrounding speech content, especially for entity-rich utterances. Second, \emph{alignment drift under weak supervision} arises when timestamp annotations are unavailable. With only utterance-level transcripts and hotword labels, a model may learn broad sentence-level semantic association rather than the local acoustic-text correspondence needed to determine whether a specific candidate was actually spoken. These two issues make global retrieval objectives poorly matched to fine-grained hotword search.
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=1\linewidth]{figure/intro.png}
-  \caption{Comparison of hotword retrieval paradigms. (a) Existing retrievers compress long speech into global embeddings or unconstrained local features, where short hotword cues are diluted or suffer from alignment drift. (b) Our method tokenizes speech into monotonic acoustic tokens via CIF and performs length-aware local late interaction to preserve fine-grained entity details under weak supervision.}
-  \label{fig:intro}
-\end{figure}
-
 We propose TLDR, a acoustic-text retriever for retrieval-augmented contextual ASR. As illustrated in Figure~\ref{fig:intro}, TLDR first converts continuous speech frames into a monotonic acoustic-token sequence using continuous integrate-and-fire (CIF). It then slides a candidate-length window over the acoustic tokens and applies token-level Text MaxSim as a late-interaction scoring function. This design keeps the retrieval decision localized while remaining robust to small boundary errors. We train the retriever with local contrastive learning, CIF quantity regularization, and an auxiliary token-level alignment objective, together with false-negative-aware batch construction for reliable in-batch contrastive learning.
-
 Our contributions are summarized as follows:
+
 \begin{itemize}
 \item We formulate hotword retrieval for contextual ASR as a weakly supervised localized cross-modal retrieval problem, where short textual entities must be matched against long speech utterances without timestamp annotations.
 \item We propose a CIF-guided acoustic-token late-interaction retriever. It converts continuous speech into monotonic acoustic tokens and performs length-aware Text MaxSim matching over local windows, preserving fine-grained entity cues without explicit temporal labels.
@@ -210,17 +210,13 @@ Our contributions are summarized as follows:
 \end{figure*}
 
 \section{Related Work}
-
 \subsection{Audio-Text Contrastive Retrieval}
-
 Audio-text contrastive learning provides a natural framework for transcription-free speech-text retrieval by aligning acoustic inputs and textual descriptions in a shared embedding space. However, most CLAP-style retrievers operate at utterance or phrase level, which is insufficient for hotword retrieval where the relevant evidence often occupies only a short local span. Recent localized retrievers such as GLCLAP~\cite{kong25_interspeech} and CLAR~\cite{huang2026clar} mitigate this issue by introducing local acoustic-text matching. Nevertheless, their scoring functions still largely compare local acoustic regions with phrase-level candidate representations, which may obscure token-level distinctions among short, phonetically similar, or substring-related hotwords. TLDR addresses this gap by preserving candidate hotwords as token sequences and performing token-level late interaction with localized acoustic tokens.
 
 \subsection{Contextual Biasing and Hotword Retrieval}
-
 Contextual biasing improves ASR recognition of rare words, named entities, and domain-specific phrases by incorporating external bias phrases into the recognizer. Existing methods mainly study how to inject or utilize a given bias list during decoding or representation learning. In contrast, our work focuses on a preceding retrieval problem: when the candidate list is large and noisy, the system must first identify which hotwords are acoustically supported by the input speech. TLDR is therefore complementary to contextual biasing methods, providing a compact and more reliable hotword set before downstream bias injection.
 
 \subsection{Acoustic Tokenization and Late Interaction}
-
 CIF converts dense frame-level speech representations into monotonic token-like acoustic units, reducing the granularity mismatch between acoustic frames and text tokens. This makes it suitable for localized hotword retrieval, where short text queries should be matched against compact acoustic spans. TLDR is also inspired by late-interaction retrieval, which preserves token-level representations and computes fine-grained matching at scoring time. Unlike text retrieval, speech-hotword retrieval requires temporal compactness and monotonicity. TLDR therefore combines CIF-based acoustic tokenization, length-aware local windows, and token-level late interaction for fine-grained transcription-free hotword retrieval.
 
 
@@ -350,6 +346,38 @@ s(x,h_i)=w_{\mathrm{local}}s_{\mathrm{local}}(x,h_i) \\
 \end{array}
 \end{equation}
 In the main retrieval setting, $w_{\mathrm{local}}$ is the dominant weight, while the global and token-level auxiliary scores are either disabled or used with small weights for calibration. The predicted hotword set is then obtained by ranking candidates or applying a decision threshold to the final scores.
+
+\section{Experiments}
+
+\subsection{Experimental Setup}
+
+\paragraph{Training Data.}
+We construct the training data from large-scale Chinese and English speech corpora. For Chinese (ZH), we use AISHELL-1(100h), AISHELL-2 (1000+h), and WenetSpeech(10,000+h) . For English (ZH+EN), we use LibriSpeech (960h) and GigaSpeech(10,000+h). Based on these corpora, we consider two training regimes. The \textit{ZH} setting uses only the AISHELL-2 corpora, whereas the \textit{ZH+EN} setting additionally incorporates all corpora. This comparison allows us to evaluate both in-language retrieval performance and the robustness of different matching mechanisms under restricted language coverage.
+
+For each training utterance, candidate hotwords are randomly extracted from its transcription. We ensure that the evaluation utterances and hotword candidates do not overlap with the training set at the utterance level.
+
+\paragraph{Evaluation Benchmarks.}
+We evaluate all systems on Test-AISHELL1-NE, ContextASR-Bench and AISpeechMeeting. Test-AISHELL1-NE mainly evaluates Chinese named-entity and hotword retrieval under relatively clean read-speech conditions. ContextASR-Bench contains both Chinese and English evaluation subsets and is used to assess contextual speech retrieval across different languages and acoustic conditions. We additionally evaluate on AISpeech-Meeting to measure cross-domain generalization in real word meeting speech, where background noise, speaker variation, and conversational speaking styles make local hotword evidence more difficult to identify.
+
+
+\paragraph{Model Configuration.}
+We use Paraformer as the speech encoder and \texttt{bert-base-multilingual-uncased} as the text encoder for all compared methods. Paraformer converts the input speech into a sequence of acoustic representations, while the multilingual BERT encoder produces contextualized representations for the candidate hotword tokens. The speech and text representations are projected into a shared $d$-dimensional embedding space through modality-specific projection layers.
+
+To ensure a controlled comparison, GLCLAP, CLAR, and TLDR use the same speech encoder, text encoder, training data, projection dimension, and optimization configuration. They differ only in the speech-text interaction mechanism. GLCLAP uses global and local pooled representations, CLAR performs localized speech-text matching, and TLDR applies token-level late interaction over CIF-derived acoustic tokens.
+
+Unless otherwise specified, the Paraformer and BERT parameters are fine-tuned jointly, and all projection and matching modules are optimized end to end.
+
+\paragraph{Evaluation Metrics.}
+We evaluate the systems from two complementary perspectives: hotword detection and candidate ranking. For threshold-based detection, we report precision, recall, and F1 score. 
+
+\paragraph{Implementation Details.}
+All models are implemented in PyTorch and trained using Adamw with an initial learning rate of 1e-5. We use a batch size of 128 and train each model for EN+ZH 10epochs and ZH 30 epochs. The acoustic and text representations are projected to a shared dimension of d=512. The temperature parameter in the contrastive objective is set to $1 / 0.07$, and the maximum candidate hotword length is 256 tokens.
+
+For TLDR, the CIF module converts frame-level speech representations into monotonic acoustic tokens. Candidate dependent local windows are constructed according to the number of text tokens in each hotword. We use acoustic token frames length as the slide window step and mean pool to aggregate token-level matching scores.
+
+All reported results are averaged over 3 random seeds.  Training is conducted on 32 Nvidia A800 GPUs.
+
+
 
 \newpage
 \bibliography{aaai2027}
