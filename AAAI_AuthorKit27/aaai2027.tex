@@ -368,7 +368,7 @@ To ensure a controlled comparison, GLCLAP, CLAR, and TLDR use the same speech en
 Unless otherwise specified, the Paraformer and BERT parameters are fine-tuned jointly, and all projection and matching modules are optimized end to end.
 
 \paragraph{Evaluation Metrics.}
-We evaluate the systems from two complementary perspectives: hotword detection and candidate ranking. For threshold-based detection, we report precision, recall, and F1 score. 
+We evaluate the systems from two complementary perspectives: hotword detection and candidate ranking. For threshold-based detection, we report precision, recall, and F1 score. For ranking, we report Recall@K. For downstream contextual ASR, we report hotword F1 and word error rate (WER).
 
 \paragraph{Implementation Details.}
 All models are implemented in PyTorch and trained using Adamw with an initial learning rate of 1e-5. We use a batch size of 128 and train each model for EN+ZH 10epochs and ZH 30 epochs. The acoustic and text representations are projected to a shared dimension of d=512. The temperature parameter in the contrastive objective is set to $1 / 0.07$, and the maximum candidate hotword length is 256 tokens.
@@ -377,9 +377,45 @@ For TLDR, the CIF module converts frame-level speech representations into monoto
 
 All reported results are averaged over 3 random seeds.  Training is conducted on 32 Nvidia A800 GPUs.
 
+\input{tldr_results_bundle/results_insert}
 
 
-\newpage
+% LaTeX snippet for Experiment 2: Partial-match discrimination.
+% Figure asset:
+% figures/aaai/partial_match_combined_main.pdf
+
+\paragraph{Partial-match discrimination.}
+
+Standard retrieval benchmarks are nearly saturated, making it difficult to
+determine whether a model truly distinguishes a complete hotword from a
+partially matched alternative. We therefore construct controlled negative
+candidates that share most tokens with the target hotword and evaluate whether
+the positive hotword receives a higher score. As shown in
+Figure~\ref{fig:partial_match}, TLDR remains consistently above the baselines
+as the negative candidate becomes increasingly similar to the target. In random
+high-overlap cases, CLAR already achieves strong pairwise accuracy, but TLDR
+produces a substantially larger positive-negative margin, indicating stronger
+separation between complete and partial matches. Under phonetic replacements,
+the gap becomes more pronounced: TLDR improves high-overlap PairAcc from
+$81.3\%$ to $88.2\%$ over CLAR. These results suggest that token-level late
+interaction does not merely improve score calibration; it provides more robust
+token-wise acoustic evidence for rejecting partially matched hotwords.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure/partial_match_combined_main.pdf}
+    \caption{
+    Partial-match discrimination under random and phonetic replacements.
+    Each row corresponds to one replacement type. The first two columns show
+    PairAcc and positive-negative margin as token overlap increases, and the
+    last column reports the aggregated high-overlap setting. TLDR maintains
+    both higher accuracy and larger margins, especially for phonetic
+    replacements, indicating more robust token-wise acoustic evidence.
+    }
+    \label{fig:partial_match}
+\end{figure*}
+
+
 \bibliography{aaai2027}
 
 % Check whether the conference requires a reproducibility checklist to be included in the paper.

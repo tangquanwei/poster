@@ -1,0 +1,15 @@
+\subsection{Main Results}
+
+\input{tldr_results_bundle/table_retrieval_main}
+
+Table~\ref{tab:retrieval_main} reports the main retrieval metrics. With ZH+EN training data, TLDR consistently improves F1 over GLCLAP and CLAR, with the largest gain on ContextASR-EN (+6.8 F1 over CLAR). Since R@5 and R@10 are nearly saturated on several benchmarks, F1 and R@1 provide the clearest main-paper comparison of candidate detection and top-ranked retrieval quality.
+
+The advantage becomes more pronounced under the ZH-only setting. TLDR improves F1 by 12.0 points on ContextASR-ZH and 16.5 points on AISpeechMeeting over the strongest baseline, while matching CLAR on the cleaner AISHELL1-NE benchmark. This pattern suggests that token-level late interaction is especially useful when local hotword evidence is weak, noisy, or domain mismatched.
+
+\input{tldr_results_bundle/table_decoding_main}
+
+Table~\ref{tab:decoding_main} evaluates whether better retrieval translates into better contextual ASR. Compared with raw decoding, TLDR reduces WER by 59.4\%, 48.3\%, 54.1\%, and 34.4\% on AISHELL1-NE, ContextASR-ZH, ContextASR-EN, and AISpeechMeeting, respectively. Among retrieval-based systems, TLDR achieves the lowest WER on all benchmarks, showing that its retrieval gains are useful for downstream recognition rather than only improving standalone retrieval metrics.
+
+\subsection{Secondary Metric Analysis}
+
+\input{tldr_results_bundle/figure_secondary_metrics}
