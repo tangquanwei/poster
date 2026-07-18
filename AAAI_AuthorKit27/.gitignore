@@ -15,3 +15,7 @@ build/
 # Temporary check PDFs
 *_methodcheck.pdf
 *_equationcheck.pdf
+
+# Local plotting environment
+.venv_fig/
+__pycache__/
