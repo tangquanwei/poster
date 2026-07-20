@@ -2,6 +2,28 @@
 
 本文档记录当前项目维护 `aaai2027.tex` 时常用的 PowerShell 命令。LaTeX Workshop 已配置为把编译产物输出到 `build/`，不要再把 `.aux`、`.log`、`.fls` 等中间文件写到项目根目录。
 
+所有命令均在项目根目录执行：
+
+```powershell
+Set-Location D:\workspaceFolder\Poster\AAAI_AuthorKit27
+```
+
+## 命令速查
+
+| 任务 | PowerShell 命令 |
+| --- | --- |
+| 格式化主文档 | `latexindent -w -s aaai2027.tex` |
+| 快速编译 | `latexmk -synctex=0 -interaction=nonstopmode -file-line-error -pdf -bibtex- -outdir=build aaai2027.tex` |
+| 完整编译 | `latexmk -synctex=0 -interaction=nonstopmode -file-line-error -pdf -outdir=build aaai2027.tex` |
+| 检查 LaTeX 错误 | `rg -n "^!|Emergency stop|Fatal error" build\aaai2027.log` |
+| 检查溢出 | `rg -n "Overfull|Underfull" build\aaai2027.log` |
+| 生成主实验结果 | `python tldr_results_bundle\generate_results.py` |
+| 测试结果生成逻辑 | `python -m unittest tldr_results_bundle.test_generate_results -v` |
+| 查看工作区状态 | `git status --short` |
+| 检查 diff 空白错误 | `git diff --check` |
+
+`快速编译` 不运行 BibTeX，适合连续修改正文时使用；新增或修改引用后使用 `完整编译`。
+
 ## VS Code
 
 推荐插件：
@@ -95,6 +117,76 @@ pdflatex -synctex=0 -interaction=nonstopmode -file-line-error -halt-on-error -ou
 
 ```text
 build\aaai2027.pdf
+```
+
+## 格式化 LaTeX 源码
+
+确认 `latexindent` 已安装并可从 `PATH` 调用：
+
+```powershell
+Get-Command latexindent
+```
+
+格式化主文档：
+
+```powershell
+latexindent -w -s aaai2027.tex
+```
+
+参数说明：
+
+- `-w`：原地写回 `aaai2027.tex`。
+- `-s`：静默运行，不输出完整格式化过程。
+- 执行后会生成 `aaai2027.bak0`；再次执行时编号可能递增。
+
+格式化后先检查差异和空白错误：
+
+```powershell
+git diff -- aaai2027.tex
+git diff --check -- aaai2027.tex
+```
+
+确认内容无误后删除本次产生的 formatter 备份：
+
+```powershell
+Get-ChildItem -File -Filter "aaai2027.bak*"
+Remove-Item -Path "aaai2027.bak*"
+```
+
+最后重新编译，确认格式化没有破坏 LaTeX 结构：
+
+```powershell
+latexmk -synctex=0 -interaction=nonstopmode -file-line-error -pdf -outdir=build aaai2027.tex
+```
+
+只格式化人工维护的 `aaai2027.tex`。不要对 `tldr_results_bundle\*.tex` 批量运行 formatter，其中部分文件由脚本生成，重新生成时会被覆盖。
+
+## 生成和验证主实验结果
+
+根据 `tldr_results_bundle\tldr_results.json` 重新生成主实验表格、补充材料和 PDF 图：
+
+```powershell
+python tldr_results_bundle\generate_results.py
+```
+
+生成结果包括：
+
+- `tldr_results_bundle\table_main_results.tex`
+- `tldr_results_bundle\supplementary_results.tex`
+- `tldr_results_bundle\main_results.pdf`
+
+运行生成逻辑测试：
+
+```powershell
+python -m unittest tldr_results_bundle.test_generate_results -v
+```
+
+修改 `generate_results.py` 或 `tldr_results.json` 后，应依次执行生成、测试和完整论文编译：
+
+```powershell
+python tldr_results_bundle\generate_results.py
+python -m unittest tldr_results_bundle.test_generate_results -v
+latexmk -synctex=0 -interaction=nonstopmode -file-line-error -pdf -outdir=build aaai2027.tex
 ```
 
 ## 检查日志

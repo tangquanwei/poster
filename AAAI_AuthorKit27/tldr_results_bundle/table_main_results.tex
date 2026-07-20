@@ -1,0 +1,46 @@
+\begin{table*}[!t]
+\definecolor{resultblue}{HTML}{0072B2}
+\definecolor{resultorange}{HTML}{D55E00}
+\centering
+\caption{Main retrieval and downstream ASR results, averaged over three random seeds. Best prior denotes the stronger of GLCLAP and CLAR. F1 gains are absolute; WER reductions are relative.}
+\label{tab:main_results}
+\begin{minipage}[t]{0.52\textwidth}
+\vspace{0pt}
+\centering
+\colorbox{resultblue!10}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{\centering\color{resultblue}\textbf{(a) Hotword retrieval F1 (\%)}}}\par\smallskip
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llrrrr}
+\toprule
+Training & Dataset & Strongest prior & Prior F1 & TLDR & $\Delta$F1 \\
+\midrule
+ZH+EN & AISHELL1-NE & CLAR & 94.5 & \textcolor{resultblue}{\textbf{96.2}} & \textcolor{resultblue}{+1.7} \\
+ & ContextASR-ZH & CLAR & 94.4 & \textcolor{resultblue}{\textbf{96.7}} & \textcolor{resultblue}{+2.3} \\
+ & ContextASR-EN & CLAR & 82.0 & \textcolor{resultblue}{\textbf{88.8}} & \textcolor{resultblue}{+6.8} \\
+ & AISpeechMeeting & CLAR & 69.3 & \textcolor{resultblue}{\textbf{69.8}} & \textcolor{resultblue}{+0.5} \\
+\midrule
+ZH-only & AISHELL1-NE & CLAR & \textbf{96.9} & 96.8 & -0.1 \\
+ & ContextASR-ZH & CLAR & 80.6 & \textcolor{resultblue}{\textbf{92.6}} & \textcolor{resultblue}{+12.0} \\
+ & ContextASR-EN & GLCLAP & 1.3 & \textcolor{resultblue}{\textbf{8.7}} & \textcolor{resultblue}{+7.4} \\
+ & AISpeechMeeting & CLAR & 49.3 & \textcolor{resultblue}{\textbf{65.8}} & \textcolor{resultblue}{+16.5} \\
+\bottomrule
+\end{tabular}
+}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.46\textwidth}
+\vspace{0pt}
+\centering
+\colorbox{resultorange!10}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{\centering\color{resultorange}\textbf{(b) Downstream WER}}}\par\smallskip
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrrrr}
+\toprule
+Dataset & Raw & Strongest prior & TLDR & Oracle & vs. Raw & vs. prior \\
+\midrule
+AISHELL1-NE & 1.75 & GLCLAP / 0.77 & \textcolor{resultorange}{\textbf{0.71}} & \textit{0.51} & 59.4\% & \textcolor{resultorange}{7.8\%} \\
+ContextASR-ZH & 2.59 & CLAR / 1.36 & \textcolor{resultorange}{\textbf{1.34}} & \textit{1.35} & 48.3\% & \textcolor{resultorange}{1.5\%} \\
+ContextASR-EN & 10.97 & CLAR / 5.61 & \textcolor{resultorange}{\textbf{5.03}} & \textit{4.56} & 54.1\% & \textcolor{resultorange}{10.3\%} \\
+AISpeechMeeting & 18.90 & CLAR / 12.79 & \textcolor{resultorange}{\textbf{12.40}} & \textit{9.58} & 34.4\% & \textcolor{resultorange}{3.0\%} \\
+\bottomrule
+\end{tabular}
+}
+\end{minipage}
+\end{table*}

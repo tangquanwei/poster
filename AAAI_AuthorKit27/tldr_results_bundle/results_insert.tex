@@ -1,15 +1,73 @@
 \subsection{Main Results}
 
-\input{tldr_results_bundle/table_retrieval_main}
+Across all four benchmarks, TLDR improves macro-F1 over the strongest prior
+retriever by 2.83 points with ZH+EN training and by 8.95 points with ZH-only
+training. It leads in seven of eight regime--dataset settings; the sole
+exception is AISHELL1-NE under ZH-only training, where it trails CLAR by 0.1
+point. This clean-speech result prevents an across-the-board claim, while the
+overall pattern shows that TLDR's advantage grows as training coverage becomes
+more restricted.
 
-Table~\ref{tab:retrieval_main} reports the main retrieval metrics. With ZH+EN training data, TLDR consistently improves F1 over GLCLAP and CLAR, with the largest gain on ContextASR-EN (+6.8 F1 over CLAR). Since R@5 and R@10 are nearly saturated on several benchmarks, F1 and R@1 provide the clearest main-paper comparison of candidate detection and top-ranked retrieval quality.
+\begin{figure*}[!t]
+  \definecolor{resultblue}{HTML}{0072B2}
+  \definecolor{resultorange}{HTML}{D55E00}
+  \centering
+  \begin{minipage}[t]{0.59\textwidth}
+    \vspace{0pt}
+    \centering
+    \includegraphics[width=\linewidth]{tldr_results_bundle/main_results.pdf}
+  \end{minipage}\hfill
+  \begin{minipage}[t]{0.38\textwidth}
+    \vspace{0pt}
+    \centering
+    \scriptsize
+    \colorbox{resultblue!10}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+      \centering\color{resultblue}\bfseries (c) TLDR F1 and gain}}\par\smallskip
+    \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrr@{}}
+      \toprule
+      Dataset & ZH+EN & ZH-only \\
+      \midrule
+      AISHELL1-NE & \textbf{96.2} {\color{resultblue}(+1.7)} & 96.8 $(-0.1)$ \\
+      ContextASR-ZH & \textbf{96.7} {\color{resultblue}(+2.3)} & \textbf{92.6} {\color{resultblue}(+12.0)} \\
+      ContextASR-EN & \textbf{88.8} {\color{resultblue}(+6.8)} & \textbf{8.7} {\color{resultblue}(+7.4)} \\
+      AISpeechMeeting & \textbf{69.8} {\color{resultblue}(+0.5)} & \textbf{65.8} {\color{resultblue}(+16.5)} \\
+      \bottomrule
+    \end{tabular*}
 
-The advantage becomes more pronounced under the ZH-only setting. TLDR improves F1 by 12.0 points on ContextASR-ZH and 16.5 points on AISpeechMeeting over the strongest baseline, while matching CLAR on the cleaner AISHELL1-NE benchmark. This pattern suggests that token-level late interaction is especially useful when local hotword evidence is weak, noisy, or domain mismatched.
+    \medskip
+    \colorbox{resultorange!10}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+      \centering\color{resultorange}\bfseries (d) Retrieval-based WER}}\par\smallskip
+    \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrr@{}}
+      \toprule
+      Dataset & Best prior & TLDR & Rel. $\downarrow$ \\
+      \midrule
+      AISHELL1-NE & G / 0.77 & \textcolor{resultorange}{\textbf{0.71}} & \textcolor{resultorange}{7.8\%} \\
+      ContextASR-ZH & C / 1.36 & \textcolor{resultorange}{\textbf{1.34}} & \textcolor{resultorange}{1.5\%} \\
+      ContextASR-EN & C / 5.61 & \textcolor{resultorange}{\textbf{5.03}} & \textcolor{resultorange}{10.3\%} \\
+      AISpeechMeeting & C / 12.79 & \textcolor{resultorange}{\textbf{12.40}} & \textcolor{resultorange}{3.0\%} \\
+      \bottomrule
+    \end{tabular*}
+    \par\vspace{1pt}
+    {\color{gray}\tiny G: GLCLAP; C: CLAR; $\downarrow$: reduction vs. best prior.}
+  \end{minipage}
+  \caption{Core retrieval and downstream ASR results. (a) Absolute F1 gain over
+  the strongest prior retriever. (b) WER for raw decoding, the strongest prior,
+  TLDR, and the Oracle reference. (c) TLDR F1 with absolute gain in parentheses.
+  (d) Exact retrieval-based WER and relative reduction. Results are means over
+  three random seeds; variance is unavailable.}
+  \label{fig:main_results}
+\end{figure*}
 
-\input{tldr_results_bundle/table_decoding_main}
+The restricted-training results in Figure~\ref{fig:main_results} isolate the
+robustness gains. Relative to the strongest prior, TLDR gains 12.0 F1 points on
+ContextASR-ZH, 7.4 on the unseen English ContextASR-EN subset, and 16.5 on the
+cross-domain AISpeechMeeting benchmark. The much smaller changes on clean
+AISHELL1-NE indicate that the main benefit is not uniform score inflation, but
+better generalization under language or domain mismatch.
 
-Table~\ref{tab:decoding_main} evaluates whether better retrieval translates into better contextual ASR. Compared with raw decoding, TLDR reduces WER by 59.4\%, 48.3\%, 54.1\%, and 34.4\% on AISHELL1-NE, ContextASR-ZH, ContextASR-EN, and AISpeechMeeting, respectively. Among retrieval-based systems, TLDR achieves the lowest WER on all benchmarks, showing that its retrieval gains are useful for downstream recognition rather than only improving standalone retrieval metrics.
-
-\subsection{Secondary Metric Analysis}
-
-\input{tldr_results_bundle/figure_secondary_metrics}
+For downstream contextual ASR, TLDR obtains the lowest retrieval-based WER on
+all four datasets. Relative to raw decoding, it reduces WER by 34.4\%--59.4\%,
+demonstrating the large value of contextual retrieval itself. The stricter
+comparison with the strongest competing retriever yields smaller but consistent
+relative reductions of 1.5\%--10.3\%. Oracle hotwords are shown only as a
+reference upper bound and are not treated as a competing retrieval method.

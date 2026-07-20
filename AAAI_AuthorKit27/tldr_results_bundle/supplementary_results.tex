@@ -1,0 +1,73 @@
+% Complete secondary metrics; include this file in the supplementary material.
+\section{Complete Experimental Results}
+\begin{table*}[t]
+\centering
+\caption{Complete retrieval results (\%).}
+\label{tab:supp_retrieval}
+\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lllrrrrrr}
+\toprule
+Training & Dataset & Method & F1 & P & R & R@1 & R@5 & R@10 \\
+\midrule
+ZH+EN & AISHELL1-NE & GLCLAP & 93.2 & 90.4 & 96.2 & 96.7 & 99.0 & 99.4 \\
+ZH+EN & AISHELL1-NE & CLAR & 94.5 & 93.8 & 95.2 & 98.8 & 99.8 & 99.9 \\
+ZH+EN & AISHELL1-NE & TLDR & 96.2 & 96.7 & 95.8 & 99.1 & 99.8 & 99.8 \\
+ZH+EN & ContextASR-ZH & GLCLAP & 90.2 & 86.9 & 93.6 & 98.3 & 99.8 & 100.0 \\
+ZH+EN & ContextASR-ZH & CLAR & 94.4 & 93.5 & 95.3 & 100.0 & 100.0 & 100.0 \\
+ZH+EN & ContextASR-ZH & TLDR & 96.7 & 96.0 & 97.3 & 100.0 & 100.0 & 100.0 \\
+ZH+EN & ContextASR-EN & GLCLAP & 76.3 & 70.3 & 83.3 & 80.1 & 96.4 & 99.8 \\
+ZH+EN & ContextASR-EN & CLAR & 82.0 & 83.0 & 81.2 & 98.6 & 100.0 & 100.0 \\
+ZH+EN & ContextASR-EN & TLDR & 88.8 & 90.8 & 86.9 & 98.9 & 100.0 & 100.0 \\
+ZH+EN & AISpeechMeeting & GLCLAP & 59.0 & 58.7 & 59.4 & 64.5 & 85.6 & 88.9 \\
+ZH+EN & AISpeechMeeting & CLAR & 69.3 & 71.3 & 67.4 & 76.8 & 93.2 & 95.0 \\
+ZH+EN & AISpeechMeeting & TLDR & 69.8 & 73.7 & 66.3 & 77.3 & 93.2 & 95.8 \\
+\midrule
+ZH-only & AISHELL1-NE & GLCLAP & 90.3 & 88.4 & 92.2 & 88.7 & 98.5 & 99.3 \\
+ZH-only & AISHELL1-NE & CLAR & 96.9 & 96.8 & 96.9 & 99.5 & 100.0 & 100.0 \\
+ZH-only & AISHELL1-NE & TLDR & 96.8 & 98.2 & 95.3 & 99.3 & 100.0 & 100.0 \\
+ZH-only & ContextASR-ZH & GLCLAP & 78.6 & 86.9 & 75.3 & 16.3 & 71.6 & 93.4 \\
+ZH-only & ContextASR-ZH & CLAR & 80.6 & 78.9 & 82.3 & 96.7 & 100.0 & 100.0 \\
+ZH-only & ContextASR-ZH & TLDR & 92.6 & 91.4 & 93.9 & 95.0 & 100.0 & 100.0 \\
+ZH-only & ContextASR-EN & GLCLAP & 1.3 & 0.8 & 3.1 & 0.2 & 0.7 & 1.0 \\
+ZH-only & ContextASR-EN & CLAR & 1.3 & 2.4 & 0.9 & 1.4 & 6.4 & 11.4 \\
+ZH-only & ContextASR-EN & TLDR & 8.7 & 6.7 & 12.2 & 16.7 & 36.7 & 53.4 \\
+ZH-only & AISpeechMeeting & GLCLAP & 41.0 & 38.2 & 49.0 & 53.1 & 75.1 & 82.0 \\
+ZH-only & AISpeechMeeting & CLAR & 49.3 & 48.4 & 50.2 & 54.5 & 75.2 & 82.0 \\
+ZH-only & AISpeechMeeting & TLDR & 65.8 & 68.6 & 63.3 & 67.9 & 86.7 & 90.0 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+\begin{table*}[t]
+\centering
+\caption{Complete downstream decoding results.}
+\label{tab:supp_decoding}
+\small
+\begin{tabular}{llrrrr}
+\toprule
+Dataset & Method & F1 & P & R & WER \\
+\midrule
+AISHELL1-NE & Raw & 92.6 & 99.6 & 86.5 & 1.75 \\
+AISHELL1-NE & Oracle hotwords & 99.8 & 100.0 & 99.7 & 0.51 \\
+AISHELL1-NE & +GLCLAP & 98.3 & 99.1 & 97.5 & 0.77 \\
+AISHELL1-NE & +CLAR & 98.5 & 97.8 & 99.2 & 0.88 \\
+AISHELL1-NE & +TLDR & 98.7 & 99.0 & 98.4 & 0.71 \\
+ContextASR-ZH & Raw & 92.1 & 100.0 & 85.4 & 2.59 \\
+ContextASR-ZH & Oracle hotwords & 99.3 & 99.7 & 98.9 & 1.35 \\
+ContextASR-ZH & +GLCLAP & 99.0 & 100.0 & 97.9 & 1.40 \\
+ContextASR-ZH & +CLAR & 99.2 & 99.2 & 99.2 & 1.36 \\
+ContextASR-ZH & +TLDR & 99.2 & 100.0 & 98.4 & 1.34 \\
+ContextASR-EN & Raw & 77.4 & 99.5 & 63.3 & 10.97 \\
+ContextASR-EN & Oracle hotwords & 99.4 & 100.0 & 98.8 & 4.56 \\
+ContextASR-EN & +GLCLAP & 95.4 & 98.3 & 92.7 & 5.73 \\
+ContextASR-EN & +CLAR & 95.4 & 98.8 & 92.3 & 5.61 \\
+ContextASR-EN & +TLDR & 97.3 & 99.5 & 93.2 & 5.03 \\
+AISpeechMeeting & Raw & 23.3 & 93.9 & 13.3 & 18.90 \\
+AISpeechMeeting & Oracle hotwords & 97.1 & 99.7 & 94.7 & 9.58 \\
+AISpeechMeeting & +GLCLAP & 67.5 & 85.6 & 55.7 & 14.86 \\
+AISpeechMeeting & +CLAR & 77.3 & 74.5 & 80.3 & 12.79 \\
+AISpeechMeeting & +TLDR & 80.3 & 80.2 & 80.4 & 12.40 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+\input{tldr_results_bundle/figure_secondary_metrics}
